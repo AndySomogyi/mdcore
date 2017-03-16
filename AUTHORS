@@ -1,0 +1,5 @@
+Pedro Gonnet: First version of all files.
+Aidan Chalk: GPU code, METIS-enabled domain partition.
+
+Note: mdcore contains modified versions of the file "cycle.h"
+    from the fftw distribution.

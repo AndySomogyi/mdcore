@@ -31,7 +31,7 @@
 #else
     #include "cycle.h"
 #endif
-#include "../config.h"
+#include "mdcore_single.h"
 
 /* MPI headers. */
 #ifdef WITH_MPI
@@ -45,7 +45,9 @@
 #endif
 
 /* OpenMP headers. */
+#ifdef HAVE_OPENMP
 #include <omp.h>
+#endif
 
 /* What to do if ENGINE_FLAGS was not defined? */
 #ifndef ENGINE_FLAGS
@@ -55,8 +57,6 @@
     #define CPU_TPS 2.67e+9
 #endif
 
-// include local headers
-#include "mdcore.h"
 
 int main ( int argc , char *argv[] ) {
 
@@ -343,10 +343,12 @@ int main ( int argc , char *argv[] ) {
     printf("main: setup took %.3f ms.\n",(double)(toc-tic) * 1000 / CPU_TPS);
     
     // did the user specify a number of runners?
+    #ifdef HAVE_OPENMP
     if ( argc > 1 ) {
         nr_runners = atoi( argv[1] );
         omp_set_num_threads( nr_runners );
-        }
+    }
+    #endif
         
     // start the engine
     #ifdef CELL

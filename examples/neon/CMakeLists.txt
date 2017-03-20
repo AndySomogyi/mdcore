@@ -16,27 +16,27 @@
 # along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 # Automake stuff
-AUTOMAKE_OPTIONS=gnu
+#AUTOMAKE_OPTIONS=gnu
 
 # Add the source directory and debug to CFLAGS
-AM_CFLAGS = -g -I../../src -Wall $(OPENMP_CFLAGS) $(FFTW3_CFLAGS)
+#AM_CFLAGS = -g -I../../src -Wall $(OPENMP_CFLAGS) $(FFTW3_CFLAGS)
 
 # Set the linker flags if metis is present
-AM_LDFLAGS = $(METIS_LDFLAGS) $(FFTW3_LDFLAGS)
+#AM_LDFLAGS = $(METIS_LDFLAGS) $(FFTW3_LDFLAGS)
 
 # Set-up the library
-bin_PROGRAMS = neon neon_pseudoverlet
+#bin_PROGRAMS = neon neon_pseudoverlet
 
 # Plain old tests
 # Sources for test
-neon_SOURCES = neon.c
-neon_CFLAGS = -DENGINE_FLAGS="engine_flag_none" -DFPTYPE_SINGLE $(AM_CFLAGS)
-neon_LDADD = ../../src/.libs/libmdcore_single.a
 
+add_executable(neon neon.c)
+target_compile_definitions(neon PUBLIC ENGINE_FLAGS=engine_flag_none)
+target_link_libraries(neon mdcore_single)
 
 # Using pairwise Verlet lists of the second kind
 # Sources for neon_pseudoverlet
-neon_pseudoverlet_SOURCES = neon.c
-neon_pseudoverlet_CFLAGS = -DFPTYPE_SINGLE -DENGINE_FLAGS="engine_flag_verlet_pseudo" $(AM_CFLAGS)
-neon_pseudoverlet_LDADD = ../../src/.libs/libmdcore_single.a
+add_executable(neon_pseudoverlet neon.c)
+target_compile_definitions(neon_pseudoverlet PUBLIC ENGINE_FLAGS=engine_flag_verlet_pseudo)
+target_link_libraries(neon_pseudoverlet mdcore_single)
 

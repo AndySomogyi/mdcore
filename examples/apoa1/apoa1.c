@@ -28,7 +28,7 @@
 #include <pthread.h>
 #include <time.h>
 #include "cycle.h"
-#include "../config.h"
+#include "mdcore_single.h"
 
 /* MPI headers. */
 #ifdef WITH_MPI
@@ -42,10 +42,8 @@
 #endif
 
 /* OpenMP headers. */
-#include <omp.h>
+//#include <omp.h>
 
-/* Include mdcore. */
-#include "mdcore.h"
 
 /* Ticks Per Second. */
 #ifndef CPU_TPS
@@ -401,9 +399,11 @@ int main ( int argc , char *argv[] ) {
         errs_dump(stdout);
         return -1;
         }
-        
+
+    #ifdef HAVE_OPENMP
     /* Set the number of OpenMP threads to the number of runners. */
     omp_set_num_threads( nr_runners );
+    #endif
         
         
     /* Give the system a quick shake before going anywhere. */

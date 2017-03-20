@@ -28,7 +28,7 @@
 #include <math.h>
 
 /* Include conditional headers. */
-#include "../config.h"
+#include "config.h"
 #ifdef HAVE_OPENMP
     #include <omp.h>
 #endif

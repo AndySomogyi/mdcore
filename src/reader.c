@@ -27,7 +27,7 @@
 #include <alloca.h>
 
 /* include local headers */
-#include "../config.h"
+#include "config.h"
 #include "errs.h"
 #include "reader.h"
 

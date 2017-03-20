@@ -30,7 +30,7 @@
 #endif
 
 /* Include conditional headers. */
-#include "../config.h"
+#include "config.h"
 #ifdef WITH_MPI
     #include <mpi.h>
 #endif

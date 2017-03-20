@@ -31,7 +31,7 @@
 #else
     #include "cycle.h"
 #endif
-#include "../config.h"
+
 
 /* MPI headers. */
 #ifdef WITH_MPI
@@ -39,7 +39,9 @@
 #endif
 
 /* OpenMP headers. */
+#ifdef HAVE_OPENMP
 #include <omp.h>
+#endif
 
 /* FFTW3 headers. */
 #ifdef HAVE_FFTW3
@@ -56,7 +58,7 @@
 #endif
 
 // include local headers
-#include "mdcore.h"
+#include "mdcore_single.h"
 
 int main ( int argc , char *argv[] ) {
 
@@ -221,10 +223,12 @@ int main ( int argc , char *argv[] ) {
     printf("main: setup took %.3f ms.\n",(double)(toc-tic) * 1000 / CPU_TPS);
     
     // did the user specify a number of runners?
+    #if HAVE_OPENMP
     if ( argc > 1 ) {
         nr_runners = atoi( argv[1] );
         omp_set_num_threads( nr_runners );
         }
+    #endif
         
     // start the engine
     #ifdef CELL

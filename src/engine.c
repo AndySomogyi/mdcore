@@ -30,7 +30,7 @@
 #endif
 
 /* Include conditional headers. */
-#include "../config.h"
+#include "config.h"
 #ifdef WITH_MPI
     #include <mpi.h>
 #endif
@@ -39,6 +39,13 @@
 #endif
 #ifdef WITH_METIS
     #include <metis.h>
+#endif
+
+#ifdef _OPENMP
+   #include <omp.h>
+#else
+   #define omp_get_thread_num() 0
+   #define omp_get_num_threads() 1
 #endif
 
 /* include local headers */
@@ -1857,7 +1864,8 @@ int engine_advance ( struct engine *e ) {
         
         #pragma omp parallel private(cid,c,pid,p,w,k,epot_local)
         {
-            step = omp_get_num_threads(); epot_local = 0.0;
+            step = omp_get_num_threads();
+            epot_local = 0.0;
             for ( cid = omp_get_thread_num() ; cid < s->nr_real ; cid += step ) {
                 c = &(s->cells[ s->cid_real[cid] ]);
                 epot_local += c->epot;

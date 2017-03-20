@@ -30,7 +30,7 @@
 #endif
 
 /* Include conditional headers. */
-#include "../config.h"
+#include "config.h"
 #ifdef WITH_MPI
     #include <mpi.h>
 #endif
@@ -486,13 +486,15 @@ int engine_rigid_eval ( struct engine *e ) {
                 }
                 
             /* Wait for exchange to come in. */
-            tic = getticks();
+            #ifdef WITH_MPI
+            //tic = getticks();
             if ( e->flags & engine_flag_async )
                 if ( engine_exchange_wait( e ) < 0 )
                     return error(engine_err);
-            tic = getticks() - tic;
-            e->timers[engine_timer_exchange1] += tic;
-            e->timers[engine_timer_verlet] -= tic;
+            //tic = getticks() - tic;
+            //e->timers[engine_timer_exchange1] += tic;
+            //e->timers[engine_timer_verlet] -= tic;
+            #endif
                 
             /* Shake semi-local rigids. */
             if ( e->flags & engine_flag_shake ) {

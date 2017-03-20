@@ -31,7 +31,7 @@
 #else
     #include "cycle.h"
 #endif
-#include "../config.h"
+#include "mdcore_single.h"
 
 /* MPI headers. */
 #ifdef HAVE_MPI
@@ -44,8 +44,7 @@
     #include <fftw3.h>
 #endif
 
-/* OpenMP headers. */
-#include <omp.h>
+
 
 /* What to do if ENGINE_FLAGS was not defined? */
 #ifndef ENGINE_FLAGS
@@ -55,8 +54,7 @@
     #define CPU_TPS 2.67e+9
 #endif
 
-// include local headers
-#include "mdcore.h"
+
 
 int main ( int argc , char *argv[] ) {
 
@@ -109,7 +107,7 @@ int main ( int argc , char *argv[] ) {
     
     // initialize the engine
     printf("main: initializing the engine... "); fflush(stdout);
-    if ( engine_init( &e , origin , dim , L , cutoff , space_periodic_full , 2 , ENGINE_FLAGS ) != 0 ) {
+    if ( engine_init( &e , origin , dim , L , cutoff , space_periodic_full , 2 , engine_flag_none ) != 0 ) {
         printf("main: engine_init failed with engine_err=%i.\n",engine_err);
         errs_dump(stdout);
         return 1;
@@ -222,7 +220,7 @@ int main ( int argc , char *argv[] ) {
     // did the user specify a number of runners?
     if ( argc > 1 ) {
         nr_runners = atoi( argv[1] );
-        omp_set_num_threads( nr_runners );
+        //omp_set_num_threads( nr_runners );
         }
         
     // start the engine

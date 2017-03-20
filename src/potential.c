@@ -971,7 +971,7 @@ int potential_init ( struct potential *p , double (*f)( double ) , double (*fp)(
 
     double alpha, w;
     int l = potential_ivalsa, r = potential_ivalsb, m;
-    FPTYPE err_l, err_r, err_m;
+    FPTYPE err_l=0, err_r=0, err_m=0;
     FPTYPE *xi_l, *xi_r, *xi_m;
     FPTYPE *c_l, *c_r, *c_m;
     int i, k;
@@ -1029,7 +1029,7 @@ int potential_init ( struct potential *p , double (*f)( double ) , double (*fp)(
         }
     if ( potential_getcoeffs(f,fp,xi_l,l,&c_l[potential_chunk],&err_l) < 0 )
         return error(potential_err);
-    /* fflush(stderr); printf("potential_init: err_l=%22.16e.\n",err_l); */
+    fflush(stderr); printf("potential_init: err_l=%22.16e.\n",err_l);
         
     /* if this interpolation is good enough, stop here! */
     if ( err_l < tol ) {
@@ -1069,7 +1069,7 @@ int potential_init ( struct potential *p , double (*f)( double ) , double (*fp)(
     while ( 1 ) {
     
         /* compute the larger interpolation... */
-        /* printf("potential_init: trying r=%i...\n",r); fflush(stdout); */
+        printf("potential_init: trying r=%i...\n",r); fflush(stdout);
         xi_r = (FPTYPE *)malloc( sizeof(FPTYPE) * (r + 1) );
         if ( posix_memalign( (void **)&c_r , potential_align , sizeof(FPTYPE) * (r+1) * potential_chunk ) != 0 )
             return error(potential_err_malloc);
@@ -1079,13 +1079,18 @@ int potential_init ( struct potential *p , double (*f)( double ) , double (*fp)(
             while ( 1 ) {
                 e = i - r * (p->alpha[0] + xi_r[i]*(p->alpha[1] + xi_r[i]*p->alpha[2]));
                 xi_r[i] += e / (r * (p->alpha[1] + 2*xi_r[i]*p->alpha[2]));
+                
+                printf("i: %i, r: %i, a: %f, b: %f, e: %f\n", i, r, a, b, e);
                 if ( fabs(e) < r*mtol )
                     break;
                 }
             }
+        
+        printf("potential_init before: err_r=%22.16e, tol=%22.16e\n",err_r, tol);
         if ( potential_getcoeffs(f,fp,xi_r,r,&c_r[potential_chunk],&err_r) < 0 )
             return error(potential_err);
-        /* printf("potential_init: err_r=%22.16e.\n",err_r); fflush(stdout); */
+        
+        printf("potential_init: err_r=%22.16e, tol=%22.16e\n",err_r, tol); fflush(stdout);
             
         /* if this is better than tolerance, break... */
         if ( err_r < tol )
@@ -1363,6 +1368,14 @@ int potential_getfp_fixend ( double (*f)( double ) , double fpa , double fpb , i
     return potential_err_ok;
         
     }
+
+static void printda(const char* name, double* array, int n) {
+    printf("%s[", name);
+    for(int i = 0; i < n; ++i) {
+        printf("%f, ", array[i]);
+    }
+    printf("]\n");
+}
     
     
 /**
@@ -1397,6 +1410,8 @@ int potential_getcoeffs ( double (*f)( double ) , double (*fp)( double ) , FPTYP
     double fx[potential_N];
     static FPTYPE *coskx = NULL;
 
+    printf("potential_getcoeffs, n=%i\n", n);
+
     /* check input sanity */
     if ( f == NULL || xi == NULL || err == NULL )
         return error(potential_err_null);
@@ -1411,10 +1426,11 @@ int potential_getcoeffs ( double (*f)( double ) , double (*fp)( double ) , FPTYP
         }
         
     /* Get fx and fpx. */
-    for ( k = 0 ; k <= n ; k++ ) {
+    for ( k = 0 ; k < n ; k++ ) {
         fix[k] = f( xi[k] );
         // fpx[k] = fp( xi[k] );
         }
+    printda("fix", fix, n);
         
     /* Compute the optimal fpx. */
     if ( fp == NULL ) {
@@ -1425,9 +1441,11 @@ int potential_getcoeffs ( double (*f)( double ) , double (*fp)( double ) , FPTYP
         if ( potential_getfp_fixend( f , fp(xi[0]) , fp(xi[n]) , n , xi , fpx ) < 0 )
             return error(potential_err);
         }
-    /* for ( k = 0 ; k <= n ; k++ )
-        printf( "potential_getcoeffs: fp[%i]=%e , fpx[%i]=%e.\n" , k , fp(xi[k]) , k , fpx[k] );
-    fflush(stdout); getchar(); */
+    //for ( k = 0 ; k <= n ; k++ )
+    //    printf( "potential_getcoeffs: fp[%i]=%e , fpx[%i]=%e.\n" , k , fp(xi[k]) , k , fpx[k] );
+    //fflush(stdout); getchar();
+    
+    printda("fix", fix, n);
         
     /* init the maximum interpolation error */
     *err = 0.0;
@@ -1444,8 +1462,13 @@ int potential_getcoeffs ( double (*f)( double ) , double (*fp)( double ) , FPTYP
         
         /* evaluate f and fp at the edges */
         fa = fix[i]; fb = fix[i+1];
+        
+        printda("fix", fix, n);
+        
+      
+        printf("edge, i:%i fa:%f, fb:%f\n", i, fa, fb);
         dfa = fpx[i] * h; dfb = fpx[i+1] * h;
-        // printf("potential_getcoeffs: xi[i]=%22.16e\n",xi[i]);
+        printf("potential_getcoeffs: xi[i]=%22.16e\n",xi[i]);
         
         /* compute the coefficients phi of f */
         for ( k = 0 ; k < potential_N ; k++ )
@@ -1464,6 +1487,11 @@ int potential_getcoeffs ( double (*f)( double ) , double (*fp)( double ) , FPTYP
         cee[3] = (fa - fb + dfa + dfb) / 16;
         cee[4] = 0.0;
         cee[5] = 0.0;
+        
+        printf("fa:%f, fb:%f, dfa:%f, dfb:%f\n", fa, fb, dfa, dfb);
+        //fflush(stdout); getchar();
+        
+        //printf("cee-1[%f, %f, %f, %f, %f, %f]\n", cee[0], cee[1], cee[2], cee[3], cee[4], cee[5]);
         
         /* add the 4th correction... */
         w = ( 6 * ( cee[0] - phi[0]) - 4 * ( cee[2] - phi[2] ) - phi[4] ) / ( 36 + 16 + 1 );
@@ -1486,6 +1514,12 @@ int potential_getcoeffs ( double (*f)( double ) , double (*fp)( double ) , FPTYP
         c[ind+2] = 16*cee[5];
         c[ind+1] = 1.0 / h;
         c[ind] = m;
+        
+        
+        
+        //printf("c[ind+7]:%f, c[ind+6]:%f, c[ind+5]:%f, \nc[ind+4]:%f, c[ind+3]:%f, c[ind+2]:%f, e:%f, err_loc:%f\n",
+        //       c[ind+7], c[ind+6], c[ind+5], c[ind+4], c[ind+3], c[ind+2], e, err_loc);
+
 
         /* compute a local error estimate (klutzy) */
         maxf = 0.0; err_loc = 0.0;
@@ -1498,12 +1532,20 @@ int potential_getcoeffs ( double (*f)( double ) , double (*fp)( double ) , FPTYP
                 x * ( c[ind+4] + 
                 x * ( c[ind+3] + 
                 x * c[ind+2] )))) );
+            //printf("fx[%i]:%f, c[ind+7]:%f, c[ind+6]:%f, c[ind+5]:%f, \nc[ind+4]:%f, c[ind+3]:%f, c[ind+2]:%f, e:%f, err_loc:%f\n",
+            //       k, fx[k], c[ind+7], c[ind+6], c[ind+5], c[ind+4], c[ind+3], c[ind+2], e, err_loc);
+            //printf("x:%f, fx[%i]:%f, e:%f, err_loc:%f\n", x, k, fx[k], e, err_loc);
             err_loc = fmax( e , err_loc );
             }
         err_loc /= fmax( maxf , 1.0 );
+        
+        printf("potential_getcoeffs, err_loc:%f, *err:%f\n", err_loc, *err);
         *err = fmax( err_loc , *err );
         
         }
+    
+    
+    
         
     /* all is well that ends well... */
     return potential_err_ok;

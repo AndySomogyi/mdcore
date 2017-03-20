@@ -53,12 +53,32 @@ set(PUBLIC_HEADERS
 
 # Both precisions have the same sources.
 SET(SOURCES
-  cell.c part.c runner.c engine.c potential.c space.c errs.c 
-  bond.c angle.c reader.c rigid.c dihedral.c exclusion.c engine_io.c 
-  engine_bonded.c engine_rigid.c engine_exchange.c 
-  runner_dopair.c queue.c runner_dosort.c 
-  task.c spme.c
+  cell.c
+  part.c
+  runner.c
+  engine.c
+  potential.c
+  space.c
+  errs.c 
+  bond.c
+  angle.c
+  reader.c
+  rigid.c
+  dihedral.c
+  exclusion.c
+  engine_io.c 
+  engine_bonded.c
+  engine_rigid.c
+  runner_dopair.c
+  queue.c
+  runner_dosort.c 
+  task.c
+  spme.c
   )
+
+if(MDCORE_USE_MPI)
+  set(SOURCES ${SOURCES} engine_exchange.c)
+endif()
 
 # CUDA sources
 #if HAVECUDA

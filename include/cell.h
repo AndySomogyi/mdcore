@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of mdcore.
  * Coypright (c) 2010 Pedro Gonnet (pedro.gonnet@durham.ac.uk)
+ * Coypright (c) 2017 Andy Somogyi (somogyie at indiana dot edu)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -16,6 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
+
+#ifndef INCLUDE_CELL_H_
+#define INCLUDE_CELL_H_
+
+#include "platform.h"
+#include "pthread.h"
 
 
 /* cell error codes */
@@ -42,6 +49,8 @@
 #define cell_flag_wait                  2
 #define cell_flag_waited                4
 #define cell_flag_marked                8
+
+MDCORE_BEGIN_DECLS
 
 
 /* Map shift vector to sortlist. */
@@ -116,3 +125,7 @@ int cell_add_incomming_multiple ( struct cell *c , struct part *p , int count );
 int cell_welcome ( struct cell *c , struct part **partlist );
 int cell_load ( struct cell *c , struct part *parts , int nr_parts , struct part **partlist , struct cell **celllist );
 int cell_flush ( struct cell *c , struct part **partlist , struct cell **celllist );
+
+MDCORE_END_DECLS
+
+#endif // INCLUDE_CELL_H_

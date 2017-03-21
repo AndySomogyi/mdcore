@@ -22,6 +22,8 @@
  * WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
  *
  */
+#ifndef INCLUDE_CYCLE_H_
+#define INCLUDE_CYCLE_H_
 
 
 /* machine-dependent cycle counters code. Needs to be inlined. */
@@ -511,4 +513,5 @@ INLINE_ELAPSED(inline)
 #define HAVE_TICK_COUNTER
 #endif
 #endif /* HAVE_MIPS_ZBUS_TIMER */
+#endif // INCLUDE_CYCLE_H_
 

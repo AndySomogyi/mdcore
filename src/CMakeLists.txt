@@ -42,6 +42,14 @@ set(PUBLIC_HEADERS
   "${CMAKE_SOURCE_DIR}/include/angle.h"
   "${CMAKE_SOURCE_DIR}/include/exclusion.h"
   "${CMAKE_SOURCE_DIR}/include/dihedral.h"
+  "${CMAKE_SOURCE_DIR}/include/cycle.h"
+  )
+
+set(PRIVATE_HEADERS
+  "btree.h"
+  "mainpage.h"
+  "potential_eval.h"
+  "reader.h"
   )
 
 #add_library(${_target} ${ARGN} ${_header_list})
@@ -122,12 +130,14 @@ function(add_mdcore_single)
 
   set(SINGLE_HEADERS
     ${PUBLIC_HEADERS}
+    ${PRIVATE_HEADERS}
     "${CMAKE_BINARY_DIR}/include/mdcore_single.h"
     "${CMAKE_BINARY_DIR}/include/mdcore_single_config.h"
     )
+  
   message("SINGLE_HEADERS: ${SINGLE_HEADERS}")
   
-  source_group("Single Public Includes" FILES ${SINGLE_HEADERS})
+  source_group("Includes" FILES ${SINGLE_HEADERS})
   add_library(mdcore_single STATIC ${SOURCES} ${SINGLE_HEADERS})
   target_compile_definitions(mdcore_single PUBLIC MDCORE_SINGLE)
 endfunction(add_mdcore_single)

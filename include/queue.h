@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of mdcore.
  * Coypright (c) 2010 Pedro Gonnet (pedro.gonnet@durham.ac.uk)
+ * Coypright (c) 2017 Andy Somogyi (somogyie at indiana dot edu)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -16,6 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
+#ifndef INCLUDE_MDCORE_QUEUE_H_
+#define INCLUDE_MDCORE_QUEUE_H_
+#include "platform.h"
+
+MDCORE_BEGIN_DECLS
 
 /* queue error codes */
 #define queue_err_ok                    0
@@ -64,3 +70,6 @@ int queue_init ( struct queue *q , int size , struct space *s , struct task *tas
 void queue_reset ( struct queue *q );
 int queue_insert ( struct queue *q , struct task *t );
 struct task *queue_get ( struct queue *q , int rid , int keep );
+
+MDCORE_END_DECLS
+#endif // INCLUDE_MDCORE_QUEUE_H_

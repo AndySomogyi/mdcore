@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of mdcore.
  * Coypright (c) 2010 Pedro Gonnet (pedro.gonnet@durham.ac.uk)
+ * Coypright (c) 2017 Andy Somogyi (somogyie at indiana dot edu)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -16,6 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
+
+#ifndef INCLUDE_RUNNER_H_
+#define INCLUDE_RUNNER_H_
+
+#include "platform.h"
+#include "cycle.h"
 
 /* runner error codes */
 #define runner_err_ok                    0
@@ -87,6 +94,8 @@ extern ticks runner_timers[];
     #define TIMER_TOC2(t)
 #endif
 
+MDCORE_BEGIN_DECLS
+
     
 /* the last error */
 extern int runner_err;
@@ -153,6 +162,8 @@ struct runner {
         };
 #endif
 
+
+
 /* associated functions */
 int runner_dopair_unsorted ( struct runner *r , struct cell *cell_i , struct cell *cell_j );
 int runner_init_SPU ( struct runner *r , struct engine *e , int id );
@@ -165,3 +176,7 @@ int runner_verlet_fill ( struct runner *r , struct cell *cell_i , struct cell *c
 int runner_dosort ( struct runner *r , struct cell *c , int flags );
 int runner_dopair ( struct runner *r , struct cell *cell_i , struct cell *cell_j , int sid );
 int runner_doself ( struct runner *r , struct cell *cell_i );
+
+MDCORE_END_DECLS
+
+#endif // INCLUDE_RUNNER_H_

@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of mdcore.
  * Coypright (c) 2012 Pedro Gonnet (pedro.gonnet@durham.ac.uk)
+ * Coypright (c) 2017 Andy Somogyi (somogyie at indiana dot edu)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -16,6 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
+#ifndef INCLUDE_LOCK_H_
+#define INCLUDE_LOCK_H_
+
 
 
 /* Get the inlining right. */
@@ -46,3 +50,5 @@
     #define lock_trylock( l ) ( ( *(l) ) ? 1 : __sync_val_compare_and_swap( l , 0 , 1 ) )
     #define lock_unlock( l ) ( __sync_val_compare_and_swap( l , 1 , 0 ) != 1 )
 #endif
+
+#endif // INCLUDE_LOCK_H_

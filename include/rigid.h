@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of mdcore.
  * Coypright (c) 2010 Pedro Gonnet (pedro.gonnet@durham.ac.uk)
+ * Coypright (c) 2017 Andy Somogyi (somogyie at indiana dot edu)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -16,6 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
+#ifndef INCLUDE_RIGID_H_
+#define INCLUDE_RIGID_H_
+#include "platform.h"
+
+MDCORE_BEGIN_DECLS
 
 /* rigid error codes */
 #define rigid_err_ok                    0
@@ -62,3 +68,6 @@ struct rigid {
 /* associated functions */
 int rigid_eval_shake ( struct rigid *r , int N , struct engine *e );
 int rigid_eval_pshake ( struct rigid *r , int N , struct engine *e , int a_update );
+
+MDCORE_END_DECLS
+#endif // INCLUDE_RIGID_H_

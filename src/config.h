@@ -19,8 +19,6 @@
 #include "mdcore_single_config.h"
 #endif
 
-
-
-
+#include "platform.h"
 
 #endif /* SRC_CONFIG_H_ */

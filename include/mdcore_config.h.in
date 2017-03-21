@@ -1,4 +1,12 @@
-/* config.h.in.  Generated from configure.in by autoheader.  */
+/*
+ * mdcore configuration
+ *
+ *  Created on: Mar 21, 2017
+ *      Author: Andy Somogyi
+ */
+
+#ifndef INCLUDE_MDCORE_CONFIG_H_
+#define INCLUDE_MDCORE_CONFIG_H_
 
 /* Support AVX (Advanced Vector Extensions) instructions */
 #undef HAVE_AVX
@@ -198,3 +206,8 @@
 #ifndef __cplusplus
 #undef inline
 #endif
+
+
+#endif // INCLUDE_MDCORE_CONFIG_H_
+
+

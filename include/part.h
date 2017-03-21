@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of mdcore.
  * Coypright (c) 2010 Pedro Gonnet (pedro.gonnet@durham.ac.uk)
+ * Coypright (c) 2017 Andy Somogyi (somogyie at indiana dot edu)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -16,7 +17,9 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
-
+#ifndef INCLUDE_PART_H_
+#define INCLUDE_PART_H_
+#include "platform.h"
 
 /* error codes */
 #define part_err_ok                     0
@@ -31,6 +34,8 @@
 
 
 /* default values */
+
+MDCORE_BEGIN_DECLS
 
 
 /** ID of the last error. */
@@ -90,3 +95,6 @@ struct part_type {
 
 /* associated functions */
 int part_init ( struct part *p , int vid , int type , unsigned int flags );
+
+MDCORE_END_DECLS
+#endif // INCLUDE_PART_H_

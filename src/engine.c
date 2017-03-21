@@ -2311,7 +2311,8 @@ int engine_finalize ( struct engine *e ) {
  * @return #engine_err_ok or < 0 on error (see #engine_err).
  */
 
-int engine_init ( struct engine *e , const double *origin , const double *dim , double *L , double cutoff , unsigned int period , int max_type , unsigned int flags ) {
+int engine_init ( struct engine *e , const double *origin , const double *dim , double *L ,
+		double cutoff , unsigned int period , int max_type , unsigned int flags ) {
 
 	int cid;
 

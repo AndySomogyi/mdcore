@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of mdcore.
  * Coypright (c) 2010 Pedro Gonnet (pedro.gonnet@durham.ac.uk)
+ * Coypright (c) 2017 Andy Somogyi (somogyie at indiana dot edu)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -16,6 +17,10 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
+
+#ifndef INCLUDE_FPTYPE_H_
+#define INCLUDE_FPTYPE_H_
+
 
 /* Global defines. */
 #ifndef FPTYPE_DEFINED
@@ -257,5 +262,7 @@ __attribute__ ((always_inline)) INLINE FPTYPE fptype_r2 ( FPTYPE *x1 , FPTYPE *x
 #endif
 
     }
+
+#endif // INCLUDE_FPTYPE_H_
     
 

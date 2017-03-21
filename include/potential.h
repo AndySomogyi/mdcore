@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of mdcore.
  * Coypright (c) 2010 Pedro Gonnet (pedro.gonnet@durham.ac.uk)
+ * Coypright (c) 2017 Andy Somogyi (somogyie at indiana dot edu)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -16,7 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
+#ifndef INCLUDE_POTENTIAL_H_
+#define INCLUDE_POTENTIAL_H_
+#include "platform.h"
 
+MDCORE_BEGIN_DECLS
 
 /* potential error codes */
 #define potential_err_ok                    0
@@ -119,3 +124,6 @@ double potential_Coulomb_p ( double r );
 double potential_Coulomb_6p ( double r );
 double potential_switch ( double r , double A , double B );
 double potential_switch_p ( double r , double A , double B );
+
+MDCORE_END_DECLS
+#endif // INCLUDE_POTENTIAL_H_

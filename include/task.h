@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of mdcore.
  * Coypright (c) 2013 Pedro Gonnet (pedro.gonnet@durham.ac.uk)
+ * Coypright (c) 2017 Andy Somogyi (somogyie at indiana dot edu)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -16,6 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
+#ifndef INCLUDE_TASK_H_
+#define INCLUDE_TASK_H_
+#include "platform.h"
+
+MDCORE_BEGIN_DECLS
 
 /* task error codes */
 #define task_err_ok                    0
@@ -78,4 +84,7 @@ struct task {
     
 /* associated functions */
 int task_addunlock ( struct task *ta , struct task *tb );
+
+MDCORE_END_DECLS
+#endif // INCLUDE_TASK_H_
 

@@ -18,6 +18,7 @@
  ******************************************************************************/
 
 #include "${MDCORE_CONFIG_FILE}"
+#include "platform.h"
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"

@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of mdcore.
  * Coypright (c) 2010 Pedro Gonnet (pedro.gonnet@durham.ac.uk)
+ * Coypright (c) 2017 Andy Somogyi (somogyie at indiana dot edu)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -16,6 +17,11 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
+#ifndef INCLUDE_SPACE_H_
+#define INCLUDE_SPACE_H_
+#include "platform.h"
+
+MDCORE_BEGIN_DECLS
 
 /* space error codes */
 #define space_err_ok                    0
@@ -147,3 +153,6 @@ int space_setpos ( struct space *s , int id , double *x );
 int space_flush ( struct space *s );
 int space_flush_ghosts ( struct space *s );
 struct task *space_addtask ( struct space *s , int type , int subtype , int flags , int i , int j );
+
+MDCORE_END_DECLS
+#endif // INCLUDE_SPACE_H_

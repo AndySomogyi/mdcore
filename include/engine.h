@@ -1,6 +1,7 @@
 /*******************************************************************************
  * This file is part of mdcore.
  * Coypright (c) 2010 Pedro Gonnet (pedro.gonnet@durham.ac.uk)
+ * Coypright (c) 2017 Andy Somogyi (somogyie at indiana dot edu)
  * 
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published
@@ -16,7 +17,12 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
+#ifndef INCLUDE_ENGINE_H_
+#define INCLUDE_ENGINE_H_
+#include "platform.h"
+#include "pthread.h"
 
+MDCORE_BEGIN_DECLS
 
 /* engine error codes */
 #define engine_err_ok                    0
@@ -87,26 +93,26 @@
 
 /** Timmer IDs. */
 enum {
-    engine_timer_step = 0,
-    engine_timer_prepare,
-    engine_timer_verlet,
-    engine_timer_exchange1,
-    engine_timer_nonbond,
-    engine_timer_bonded,
-    engine_timer_bonded_sort,
-    engine_timer_bonds,
-    engine_timer_angles,
-    engine_timer_dihedrals,
-    engine_timer_exclusions,
-    engine_timer_advance,
-    engine_timer_rigid,
-    engine_timer_exchange2,
-    engine_timer_shuffle,
-    engine_timer_cuda_load,
-    engine_timer_cuda_unload,
-    engine_timer_cuda_dopairs,
-    engine_timer_last
-    };
+	engine_timer_step = 0,
+	engine_timer_prepare,
+	engine_timer_verlet,
+	engine_timer_exchange1,
+	engine_timer_nonbond,
+	engine_timer_bonded,
+	engine_timer_bonded_sort,
+	engine_timer_bonds,
+	engine_timer_angles,
+	engine_timer_dihedrals,
+	engine_timer_exclusions,
+	engine_timer_advance,
+	engine_timer_rigid,
+	engine_timer_exchange2,
+	engine_timer_shuffle,
+	engine_timer_cuda_load,
+	engine_timer_cuda_unload,
+	engine_timer_cuda_dopairs,
+	engine_timer_last
+};
 
 
 /** ID of the last error. */
@@ -121,167 +127,168 @@ extern char *engine_err_msg[];
  */
 struct engine {
 
-    /** Some flags controlling how this engine works. */
-    unsigned int flags;
+	/** Some flags controlling how this engine works. */
+	unsigned int flags;
 
-    /** Some flags controlling which cuda scheduling we use. */
-    unsigned int flags_cuda;
+#ifdef WITH_CUDA
+	/** Some flags controlling which cuda scheduling we use. */
+	unsigned int flags_cuda;
+#endif
 
-    /** The space on which to work */
-    struct space s;
-    
-    /** Time variables */
-    int time;
-    double dt;
-    
-    /** What is the maximum nr of types? */
-    int max_type;
-    int nr_types;
-    
-    /** The particle types. */
-    struct part_type *types;
-    
-    /** The interaction matrix */
-    struct potential **p, **p_bond, **p_angle, **p_dihedral;
-    
-    /** The explicit electrostatic potential. */
-    struct potential *ep;
-    
-    /** Mutexes, conditions and counters for the barrier */
+	/** The space on which to work */
+	struct space s;
+
+	/** Time variables */
+	int time;
+	double dt;
+
+	/** What is the maximum nr of types? */
+	int max_type;
+	int nr_types;
+
+	/** The particle types. */
+	struct part_type *types;
+
+	/** The interaction matrix */
+	struct potential **p, **p_bond, **p_angle, **p_dihedral;
+
+	/** The explicit electrostatic potential. */
+	struct potential *ep;
+
+	/** Mutexes, conditions and counters for the barrier */
 	pthread_mutex_t barrier_mutex;
 	pthread_cond_t barrier_cond;
 	pthread_cond_t done_cond;
-    int barrier_count;
-    
-    /** Nr of runners */
-    int nr_runners;
-    
-    /** The runners */
-    struct runner *runners;
-    
-    /** The queues for the runners. */
-    struct queue *queues;
-    int nr_queues;
-    
-    /** The ID of the computational node we are on. */
-    int nodeID;
-    int nr_nodes;
-    
-    /** Lists of cells to exchange with other nodes. */
-    struct engine_comm *send, *recv;
-    
-    /** List of bonds. */
-    struct bond *bonds;
-    
-    /** Nr. of bonds. */
-    int nr_bonds, bonds_size;
-    
-    /** List of exclusions. */
-    struct exclusion *exclusions;
-    
-    /** Nr. of exclusions. */
-    int nr_exclusions, exclusions_size;
-    
-    /** List of rigid bodies. */
-    struct rigid *rigids;
-    
-    /** List linking parts to rigids. */
-    int *part2rigid;
-    
-    /** Nr. of rigids. */
-    int nr_rigids, rigids_size, nr_constr, rigids_local, rigids_semilocal;
-    
-    /** Rigid solver tolerance. */
-    double tol_rigid;
-    
-    /** List of angles. */
-    struct angle *angles;
-    
-    /** Nr. of angles. */
-    int nr_angles, angles_size, nr_anglepots, anglepots_size;
-    
-    /** List of dihedrals. */
-    struct dihedral *dihedrals;
-    
-    /** Nr. of dihedrals. */
-    int nr_dihedrals, dihedrals_size, nr_dihedralpots, dihedralpots_size;
-    
-    /** The Comm object for mpi. */
-    #ifdef WITH_MPI
-        MPI_Comm comm;
-        pthread_mutex_t xchg_mutex;
-        pthread_cond_t xchg_cond;
-        short int xchg_started, xchg_running;
-        pthread_t thread_exchg;
-        pthread_mutex_t xchg2_mutex;
-        pthread_cond_t xchg2_cond;
-        short int xchg2_started, xchg2_running;
-        pthread_t thread_exchg2;
-    #endif
-    
-    /** Pointers to device data for CUDA. */
-    #ifdef HAVE_CUDA
-        void *sortlists_cuda[ engine_maxgpu ];
-        int nrpots_cuda, *pind_cuda[ engine_maxgpu ], *offsets_cuda[ engine_maxgpu ];
-        int nr_devices, devices[ engine_maxgpu ];
-        float *forces_cuda[ engine_maxgpu ];
-        void *cuArray_parts[ engine_maxgpu ], *parts_cuda[ engine_maxgpu ];
-        void *parts_cuda_local;
-        int *cells_cuda_local[ engine_maxgpu];
-        int cells_cuda_nr[ engine_maxgpu ];
-        int *counts_cuda[ engine_maxgpu ], *counts_cuda_local[ engine_maxgpu ];
-        int *ind_cuda[ engine_maxgpu ], *ind_cuda_local[ engine_maxgpu ];
-        struct task_cuda *tasks_cuda[ engine_maxgpu ];
-        int *taboo_cuda[ engine_maxgpu ];
-        int nrtasks_cuda[ engine_maxgpu ];
-        void *streams[ engine_maxgpu ];
-    #endif
-    
-    /** Timers. */
-    ticks timers[engine_timer_last];
-    
-    /** Bonded sets. */
-    struct engine_set *sets;
-    int nr_sets;
-    
-    };
-    
-    
+	int barrier_count;
+
+	/** Nr of runners */
+	int nr_runners;
+
+	/** The runners */
+	struct runner *runners;
+
+	/** The queues for the runners. */
+	struct queue *queues;
+	int nr_queues;
+
+	/** The ID of the computational node we are on. */
+	int nodeID;
+	int nr_nodes;
+
+	/** Lists of cells to exchange with other nodes. */
+	struct engine_comm *send, *recv;
+
+	/** List of bonds. */
+	struct bond *bonds;
+
+	/** Nr. of bonds. */
+	int nr_bonds, bonds_size;
+
+	/** List of exclusions. */
+	struct exclusion *exclusions;
+
+	/** Nr. of exclusions. */
+	int nr_exclusions, exclusions_size;
+
+	/** List of rigid bodies. */
+	struct rigid *rigids;
+
+	/** List linking parts to rigids. */
+	int *part2rigid;
+
+	/** Nr. of rigids. */
+	int nr_rigids, rigids_size, nr_constr, rigids_local, rigids_semilocal;
+
+	/** Rigid solver tolerance. */
+	double tol_rigid;
+
+	/** List of angles. */
+	struct angle *angles;
+
+	/** Nr. of angles. */
+	int nr_angles, angles_size, nr_anglepots, anglepots_size;
+
+	/** List of dihedrals. */
+	struct dihedral *dihedrals;
+
+	/** Nr. of dihedrals. */
+	int nr_dihedrals, dihedrals_size, nr_dihedralpots, dihedralpots_size;
+
+	/** The Comm object for mpi. */
+#ifdef WITH_MPI
+	MPI_Comm comm;
+	pthread_mutex_t xchg_mutex;
+	pthread_cond_t xchg_cond;
+	short int xchg_started, xchg_running;
+	pthread_t thread_exchg;
+	pthread_mutex_t xchg2_mutex;
+	pthread_cond_t xchg2_cond;
+	short int xchg2_started, xchg2_running;
+	pthread_t thread_exchg2;
+#endif
+
+	/** Pointers to device data for CUDA. */
+#ifdef HAVE_CUDA
+	void *sortlists_cuda[ engine_maxgpu ];
+	int nrpots_cuda, *pind_cuda[ engine_maxgpu ], *offsets_cuda[ engine_maxgpu ];
+	int nr_devices, devices[ engine_maxgpu ];
+	float *forces_cuda[ engine_maxgpu ];
+	void *cuArray_parts[ engine_maxgpu ], *parts_cuda[ engine_maxgpu ];
+	void *parts_cuda_local;
+	int *cells_cuda_local[ engine_maxgpu];
+	int cells_cuda_nr[ engine_maxgpu ];
+	int *counts_cuda[ engine_maxgpu ], *counts_cuda_local[ engine_maxgpu ];
+	int *ind_cuda[ engine_maxgpu ], *ind_cuda_local[ engine_maxgpu ];
+	struct task_cuda *tasks_cuda[ engine_maxgpu ];
+	int *taboo_cuda[ engine_maxgpu ];
+	int nrtasks_cuda[ engine_maxgpu ];
+	void *streams[ engine_maxgpu ];
+#endif
+
+	/** Timers. */
+	ticks timers[engine_timer_last];
+
+	/** Bonded sets. */
+	struct engine_set *sets;
+	int nr_sets;
+};
+
+
 /**
  * Structure storing grouped sets of bonded interactions.
  */
 struct engine_set {
 
-    /* Counts of the different interaction types. */
-    int nr_bonds, nr_angles, nr_dihedrals, nr_exclusions, weight;
-    
-    /* Lists of ID of the relevant bonded types. */
-    struct bond *bonds;
-    struct angle *angles;
-    struct dihedral *dihedrals;
-    struct exclusion *exclusions;
-    
-    /* Nr of sets with which this set conflicts. */
-    int nr_confl;
-    
-    /* IDs of the sets with which this set conflicts. */
-    int *confl;
+	/* Counts of the different interaction types. */
+	int nr_bonds, nr_angles, nr_dihedrals, nr_exclusions, weight;
 
-    };
-    
-    
+	/* Lists of ID of the relevant bonded types. */
+	struct bond *bonds;
+	struct angle *angles;
+	struct dihedral *dihedrals;
+	struct exclusion *exclusions;
+
+	/* Nr of sets with which this set conflicts. */
+	int nr_confl;
+
+	/* IDs of the sets with which this set conflicts. */
+	int *confl;
+
+};
+
+
 /**
  * Structure storing which cells to send/receive to/from another node.
  */
 struct engine_comm {
 
-    /* Size and count of the cellids. */
-    int count, size;
-    
-    int *cellid;
-    
-    };
-    
+	/* Size and count of the cellids. */
+	int count, size;
+
+	int *cellid;
+
+};
+
 
 /* associated functions */
 int engine_addpot ( struct engine *e , struct potential *p , int i , int j );
@@ -309,9 +316,12 @@ int engine_flush_ghosts ( struct engine *e );
 int engine_flush ( struct engine *e );
 int engine_gettype ( struct engine *e , char *name );
 int engine_gettype2 ( struct engine *e , char *name2 );
-int engine_init ( struct engine *e , const double *origin , const double *dim , double *L , double cutoff , unsigned int period , int max_type , unsigned int flags );
-int engine_load_ghosts ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid , double *q , unsigned int *flags , int N );
-int engine_load ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid , double *charge , unsigned int *flags , int N );
+int engine_init ( struct engine *e , const double *origin , const double *dim , double *L ,
+		double cutoff , unsigned int period , int max_type , unsigned int flags );
+int engine_load_ghosts ( struct engine *e , double *x , double *v , int *type , int *pid ,
+		int *vid , double *q , unsigned int *flags , int N );
+int engine_load ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid ,
+		double *charge , unsigned int *flags , int N );
 int engine_nonbond_eval ( struct engine *e );
 int engine_read_cpf ( struct engine *e , int cpf , double kappa , double tol , int rigidH );
 int engine_read_psf ( struct engine *e , int psf , int pdb );
@@ -328,40 +338,43 @@ int engine_start_SPU ( struct engine *e , int nr_runners );
 int engine_start ( struct engine *e , int nr_runners , int nr_queues );
 int engine_step ( struct engine *e );
 int engine_timers_reset ( struct engine *e );
-int engine_unload_marked ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid , double *q , unsigned int *flags , double *epot , int N );
-int engine_unload_strays ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid , double *q , unsigned int *flags , double *epot , int N );
-int engine_unload ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid , double *charge , unsigned int *flags , double *epot , int N );
+int engine_unload_marked ( struct engine *e , double *x , double *v , int *type , int *pid ,
+		int *vid , double *q , unsigned int *flags , double *epot , int N );
+int engine_unload_strays ( struct engine *e , double *x , double *v , int *type , int *pid ,
+		int *vid , double *q , unsigned int *flags , double *epot , int N );
+int engine_unload ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid ,
+		double *charge , unsigned int *flags , double *epot , int N );
 int engine_verlet_update ( struct engine *e );
+
 #ifdef WITH_MPI
-    int engine_init_mpi ( struct engine *e , const double *origin , const double *dim , double *L , double cutoff , unsigned int period , int max_type , unsigned int flags , MPI_Comm comm , int rank );
-    int engine_exchange ( struct engine *e );
-    int engine_exchange_async ( struct engine *e );
-    int engine_exchange_async_run ( struct engine *e );
-    int engine_exchange_incomming ( struct engine *e );
-    int engine_exchange_rigid ( struct engine *e );
-    int engine_exchange_rigid_async ( struct engine *e );
-    int engine_exchange_rigid_async_run ( struct engine *e );
-    int engine_exchange_rigid_wait ( struct engine *e );
-    int engine_exchange_wait ( struct engine *e );
+int engine_init_mpi ( struct engine *e , const double *origin , const double *dim , double *L ,
+		double cutoff , unsigned int period , int max_type , unsigned int flags , MPI_Comm comm ,
+		int rank );
+int engine_exchange ( struct engine *e );
+int engine_exchange_async ( struct engine *e );
+int engine_exchange_async_run ( struct engine *e );
+int engine_exchange_incomming ( struct engine *e );
+int engine_exchange_rigid ( struct engine *e );
+int engine_exchange_rigid_async ( struct engine *e );
+int engine_exchange_rigid_async_run ( struct engine *e );
+int engine_exchange_rigid_wait ( struct engine *e );
+int engine_exchange_wait ( struct engine *e );
 #endif
+
 #if defined(HAVE_CUDA) && defined(WITH_CUDA)
-    #ifdef __cplusplus
-        extern "C" int engine_nonbond_cuda ( struct engine *e );
-        extern "C" int engine_cuda_load ( struct engine *e );
-        extern "C" int engine_cuda_load_parts ( struct engine *e );
-        extern "C" int engine_cuda_unload_parts ( struct engine *e );
-        extern "C" int engine_cuda_setdevice ( struct engine *e , int id );
-        extern "C" int engine_cuda_setdevices ( struct engine *e , int nr_devices , int *ids );
-	extern "C" int engine_split_METIS ( struct engine *e, int N, int flags);
-    #else
-        int engine_nonbond_cuda ( struct engine *e );
-        int engine_cuda_load ( struct engine *e );
-        int engine_cuda_load_parts ( struct engine *e );
-        int engine_cuda_unload_parts ( struct engine *e );
-        int engine_cuda_setdevice ( struct engine *e , int id );
-        int engine_cuda_setdevices ( struct engine *e , int nr_devices , int *ids );
-	int engine_split_METIS ( struct engine *e, int N, int flags);
-    #endif
-#else
-	int engine_split_METIS ( struct engine *e, int N, int flags);
+int engine_nonbond_cuda ( struct engine *e );
+int engine_cuda_load ( struct engine *e );
+int engine_cuda_load_parts ( struct engine *e );
+int engine_cuda_unload_parts ( struct engine *e );
+int engine_cuda_setdevice ( struct engine *e , int id );
+int engine_cuda_setdevices ( struct engine *e , int nr_devices , int *ids );
+int engine_split_METIS ( struct engine *e, int N, int flags);
 #endif
+
+#ifdef WITH_METIS
+int engine_split_METIS ( struct engine *e, int N, int flags);
+#endif
+
+MDCORE_END_DECLS
+#endif // INCLUDE_ENGINE_H_
+

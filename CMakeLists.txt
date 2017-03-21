@@ -12,6 +12,14 @@ option(MDCORE_USE_FFTW3 "use FFTW" NO)
 
 option(MDCORE_USE_OPENMP "used OpenMP (only available with GCC)" NO)
 
+option(SANITIZE "build with -fsanitize=address" NO)
+
+if(SANITIZE)
+  add_compile_options(-fsanitize=address)
+  set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -fsanitize=address")
+endif()
+
+
 # Add our module finders to cmake  |Demos/StaticBoundaryDemo/CMakeLists.txt:13:     ${GLUT_LIBRARIES}
 SET(CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/cmake)
 

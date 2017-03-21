@@ -1,6 +1,6 @@
 
-mdcore is an Open-Source platform-independent library for Molecular
-Dynamics simulations. This project aims not to provide yet another
+mdcore is small, self-contained Open-Source platform-independent library for
+Molecular Dynamics simulations. This project aims not to provide yet another
 full-featured simulation package, but rather to provide the core
 computational infrastructure for parallel MD in such a way that it can
 be easily integrated into existing simulation packages or be used
@@ -20,10 +20,12 @@ mdcore currently incorporates the following functionality:
     * Support for the Cell/BE,
     * Support for arbitrary potential functions.
     
-The source code and documentation are currently hosted on SourceForge. To
+mdcore was originally written by Pedro Gonnet, and is currently maintained by
+Andy Somogyi. 
+
+The source code and documentation are currently hosted on GitHub. To
 download the latest version, explore the tutorials, or read the documentation,
 please visit the site
 
-    http://mdcore.sourceforge.net/
+    https://andysomogyi.github.io/mdcore/
     
-More information is also available on http://www.dur.ac.uk/pedro.gonnet/.

@@ -20,6 +20,7 @@
 
 #ifndef INCLUDE_BOND_H_
 #define INCLUDE_BOND_H_
+#include "platform.h"
 
 /* bond error codes */
 #define bond_err_ok                    0
@@ -32,15 +33,14 @@ extern int bond_err;
 
 
 /** The bond structure */
-struct bond {
+typedef struct bond {
 
-    /* ids of particles involved */
-    int i, j;
-    
-    };
+	/* ids of particles involved */
+	int i, j;
 
-#include "platform.h"
-    
+} bond;
+
+
 MDCORE_BEGIN_DECLS
 
 /* associated functions */

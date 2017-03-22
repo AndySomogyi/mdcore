@@ -48,49 +48,49 @@ extern int part_err;
  * Note that the arrays for @c x, @c v and @c f are 4 entries long for
  * propper alignment.
  */
-struct part {
+typedef struct part {
 
-    /** Particle position */
-    FPTYPE x[4] __attribute__ ((aligned (16)));
+	/** Particle position */
+	FPTYPE x[4] __attribute__ ((aligned (16)));
 
-    /** Particle velocity */
-    FPTYPE v[4] __attribute__ ((aligned (16)));
+	/** Particle velocity */
+	FPTYPE v[4] __attribute__ ((aligned (16)));
 
-    /** Particle force */
-    FPTYPE f[4] __attribute__ ((aligned (16)));
-    
-    /** individual particle charge, if needed. */
-    float q;
-    
-    /** Particle id and type */
-    int id, vid;
-    
-    /** particle type. */
-    short int type;
-    
-    /** Particle flags */
-    unsigned short int flags;
-    
-    };
-    
+	/** Particle force */
+	FPTYPE f[4] __attribute__ ((aligned (16)));
+
+	/** individual particle charge, if needed. */
+	float q;
+
+	/** Particle id and type */
+	int id, vid;
+
+	/** particle type. */
+	short int type;
+
+	/** Particle flags */
+	unsigned short int flags;
+
+} part;
+
 
 
 /** Structure containing information on each particle species. */
-struct part_type {
+typedef struct part_type {
 
-    /** ID of this type */
-    int id;
-    
-    /** Constant physical characteristics */
-    double mass, imass, charge;
-    
-    /** Nonbonded interaction parameters. */
-    double eps, rmin;
-    
-    /** Name of this paritcle type. */
-    char name[64], name2[64];
-    
-    };
+	/** ID of this type */
+	int id;
+
+	/** Constant physical characteristics */
+	double mass, imass, charge;
+
+	/** Nonbonded interaction parameters. */
+	double eps, rmin;
+
+	/** Name of this paritcle type. */
+	char name[64], name2[64];
+
+} part_type;
 
 
 /* associated functions */

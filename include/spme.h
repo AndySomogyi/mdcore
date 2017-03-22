@@ -21,6 +21,8 @@
 #define INCLUDE_SPME_H_
 #include "platform.h"
 
+MDCORE_BEGIN_DECLS
+
 /* spme error codes */
 #define spme_err_ok                    0
 #define spme_err_null                  -1
@@ -39,40 +41,38 @@ extern int spme_err;
 
 
 /** The spme structure */
-struct spme {
+typedef struct spme {
 
-    #ifdef HAVE_FFTW3
+#ifdef HAVE_FFTW3
 
-    /** Grid dimensions. */
-    int dim[3];
-    
-    /** Grid spacing. */
-    float h[3], ih[3];
-    
-    /** SMPE parameter. */
-    float kappa;
-    
-    /** The charge grid. */
-    fftwf_complex *Q;
-    
-    /** The transformed grid. */
-    fftwf_complex *E;
-    
-    /** The Temporary, complex grid. */
-    fftwf_complex *T;
-    
-    /** The structure array. */
-    float *theta;
-    
-    /** The fftw plan. */
-    fftwf_plan fwplan, bwplan;
-    
-    #endif
-    
-    };
+	/** Grid dimensions. */
+	int dim[3];
 
-MDCORE_BEGIN_DECLS
-    
+	/** Grid spacing. */
+	float h[3], ih[3];
+
+	/** SMPE parameter. */
+	float kappa;
+
+	/** The charge grid. */
+	fftwf_complex *Q;
+
+	/** The transformed grid. */
+	fftwf_complex *E;
+
+	/** The Temporary, complex grid. */
+	fftwf_complex *T;
+
+	/** The structure array. */
+	float *theta;
+
+	/** The fftw plan. */
+	fftwf_plan fwplan, bwplan;
+
+#endif
+
+} spme;
+
 
 /* associated functions */
 int spme_init ( struct spme *s , int *dim , float *h , float kappa );

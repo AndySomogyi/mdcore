@@ -59,25 +59,25 @@ extern int potential_err;
 
 
 /** The #potential structure. */
-struct potential {
+typedef struct potential {
 
-    /** Coefficients for the interval transform. */
-    FPTYPE alpha[4];
-    
-    /** The coefficients. */
-    FPTYPE *c;
-    
-    /** Interval edges. */
-    double a, b;
-    
-    /** Flags. */
-    unsigned int flags;
-    
-    /** Nr of intervals. */
-    int n;
-    
-    };
-    
+	/** Coefficients for the interval transform. */
+	FPTYPE alpha[4];
+
+	/** The coefficients. */
+	FPTYPE *c;
+
+	/** Interval edges. */
+	double a, b;
+
+	/** Flags. */
+	unsigned int flags;
+
+	/** Nr of intervals. */
+	int n;
+
+} potential;
+
 
 /** Fictitious null potential. */
 extern struct potential potential_null;
@@ -110,7 +110,7 @@ struct potential *potential_create_harmonic_dihedral ( double K , int n , double
     void potential_eval_vec_4double ( struct potential *p[4] , FPTYPE *r2 , FPTYPE *e , FPTYPE *f );
     void potential_eval_vec_4double_r ( struct potential *p[4] , FPTYPE *r , FPTYPE *e , FPTYPE *f );
     void potential_eval_r ( struct potential *p , FPTYPE r , FPTYPE *e , FPTYPE *f );
-*/
+ */
 
 /* helper functions */
 double potential_LJ126 ( double r , double A , double B );

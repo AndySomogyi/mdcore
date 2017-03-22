@@ -39,30 +39,30 @@ extern int queue_err;
 
 
 /** The queue structure */
-struct queue {
+typedef struct queue {
 
-    /* Allocated size. */
-    int size;
-    
-    /* The queue data. */
-    struct task *tasks;
-        
-    /* The space in which this queue lives. */
-    struct space *space;
-        
-    /* The queue indices. */
-    int *ind;
-        
-    /* Index of next entry. */
-    int next;
-    
-    /* Index of last entry. */
-    int count;
-    
-    /* Lock for this queue. */
-    lock_type lock;
-    
-    };
+	/* Allocated size. */
+	int size;
+
+	/* The queue data. */
+	struct task *tasks;
+
+	/* The space in which this queue lives. */
+	struct space *space;
+
+	/* The queue indices. */
+	int *ind;
+
+	/* Index of next entry. */
+	int next;
+
+	/* Index of last entry. */
+	int count;
+
+	/* Lock for this queue. */
+	lock_type lock;
+
+} queue;
 
 
 /* Associated functions */

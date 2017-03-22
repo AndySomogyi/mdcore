@@ -38,9 +38,9 @@
 
 /** Alignment when allocating parts. */
 #ifdef CELL
-    #define cell_partalign                  128
+#define cell_partalign                  128
 #else
-    #define cell_partalign                  64
+#define cell_partalign                  64
 #endif
 
 /** Cell flags */
@@ -49,6 +49,7 @@
 #define cell_flag_wait                  2
 #define cell_flag_waited                4
 #define cell_flag_marked                8
+
 
 MDCORE_BEGIN_DECLS
 
@@ -63,59 +64,64 @@ extern const char cell_flip[27];
 extern int cell_err;
 
 
-/* the cell structure */
-struct cell {
+/**
+ * @brief the cell structure
+ *
+ * The cell represents a rectangular region of space, and physically
+ * stores all particle data.
+ */
+typedef struct cell {
 
-    /* some flags */
-    unsigned int flags;
-    
-    /* The ID of this cell. */
-    int id;
+	/* some flags */
+	unsigned int flags;
 
-    /* relative cell location */
-    int loc[3];
-    
-    /* absolute cell origin */
-    double origin[3];
-    
-    /* cell dimensions */
-    double dim[3];
-    
-    /* size and count of particle buffer */
-    int size, count;
-    
-    /* the particle buffer */
-    struct part *parts;
-    
-    /* buffer to store the potential energy */
-    double epot;
-    
-    /* a buffer to store incomming parts. */
-    struct part *incomming;
-    int incomming_size, incomming_count;
-    
-    /* Mutex for synchronized cell access. */
-    pthread_mutex_t cell_mutex;
+	/* The ID of this cell. */
+	int id;
+
+	/* relative cell location */
+	int loc[3];
+
+	/* absolute cell origin */
+	double origin[3];
+
+	/* cell dimensions */
+	double dim[3];
+
+	/* size and count of particle buffer */
+	int size, count;
+
+	/* the particle buffer */
+	struct part *parts;
+
+	/* buffer to store the potential energy */
+	double epot;
+
+	/* a buffer to store incomming parts. */
+	struct part *incomming;
+	int incomming_size, incomming_count;
+
+	/* Mutex for synchronized cell access. */
+	pthread_mutex_t cell_mutex;
 	pthread_cond_t cell_cond;
-    
-    /* Old particle positions for the verlet lists. */
-    FPTYPE *oldx;
-    int oldx_size;
-    
-    /* ID of the node this cell belongs to. */
-    int nodeID;
-    
-    /* Pointer to sorted cell data. */
-    unsigned int *sortlist;
-    
-    /* Sorting task for this cell. */
-    struct task *sort;
-    
-    /*ID of the GPU this cell belongs to. */
-    int GPUID;
-    
-    };
-    
+
+	/* Old particle positions for the verlet lists. */
+	FPTYPE *oldx;
+	int oldx_size;
+
+	/* ID of the node this cell belongs to. */
+	int nodeID;
+
+	/* Pointer to sorted cell data. */
+	unsigned int *sortlist;
+
+	/* Sorting task for this cell. */
+	struct task *sort;
+
+	/*ID of the GPU this cell belongs to. */
+	int GPUID;
+
+} cell;
+
 
 /* associated functions */
 int cell_init ( struct cell *c , int *loc , double *origin , double *dim );

@@ -68,79 +68,79 @@ extern int space_err;
 
 
 /** The space structure */
-struct space {
+typedef struct space {
 
-    /** Real dimensions. */
-    double dim[3];
-    
-    /** Location of origin. */
-    double origin[3];
-    
-    /** Space dimension in cells. */
-    int cdim[3];
-    
-    /** Number of cells within cutoff in each dimension. */
-    int span[3];
-    
-    /** Cell edge lengths and their inverse. */
-    double h[3], ih[3];
-    
-    /** The cutoff and the cutoff squared. */
-    double cutoff, cutoff2;
-    
-    /** Periodicities. */
-    unsigned int period;
-    
-    /** Total nr of cells in this space. */
-    int nr_cells;
-    
-    /** IDs of real, ghost and marked cells. */
-    int *cid_real, *cid_ghost, *cid_marked;
-    int nr_real, nr_ghost, nr_marked;
-    
-    /** Array of cells spanning the space. */
-    struct cell *cells;
-    
-    /** The total number of tasks. */
-    int nr_tasks, tasks_size;
-    
-    /** Array of tasks. */
-    struct task *tasks;
-    
-    /** Condition/mutex to signal task availability. */
-    pthread_mutex_t tasks_mutex;
-    pthread_cond_t tasks_avail;
-    
-    /** Taboo-list for collision avoidance */
-    char *cells_taboo;
-    
-    /** Id of #runner owning each cell. */
-    char *cells_owner;
-    
-    /** Counter for the number of swaps in every step. */
-    int nr_swaps, nr_stalls;
-    
-    /** Array of pointers to the individual parts, sorted by their ID. */
-    struct part **partlist;
-    
-    /** Array of pointers to the #cell of individual parts, sorted by their ID. */
-    struct cell **celllist;
-    
-    /** Number of parts in this space and size of the buffers partlist and celllist. */
-    int nr_parts, size_parts;
-    
-    /** Trigger re-building the cells/sorts. */
-    int verlet_rebuild;
-    
-    /** The maximum particle displacement over all cells. */
-    FPTYPE maxdx;
-    
-    /** Potential energy collected by the space itself. */
-    double epot, epot_nonbond, epot_bond, epot_angle, epot_dihedral, epot_exclusion;
+	/** Real dimensions. */
+	double dim[3];
 
-    };
-    
-    
+	/** Location of origin. */
+	double origin[3];
+
+	/** Space dimension in cells. */
+	int cdim[3];
+
+	/** Number of cells within cutoff in each dimension. */
+	int span[3];
+
+	/** Cell edge lengths and their inverse. */
+	double h[3], ih[3];
+
+	/** The cutoff and the cutoff squared. */
+	double cutoff, cutoff2;
+
+	/** Periodicities. */
+	unsigned int period;
+
+	/** Total nr of cells in this space. */
+	int nr_cells;
+
+	/** IDs of real, ghost and marked cells. */
+	int *cid_real, *cid_ghost, *cid_marked;
+	int nr_real, nr_ghost, nr_marked;
+
+	/** Array of cells spanning the space. */
+	struct cell *cells;
+
+	/** The total number of tasks. */
+	int nr_tasks, tasks_size;
+
+	/** Array of tasks. */
+	struct task *tasks;
+
+	/** Condition/mutex to signal task availability. */
+	pthread_mutex_t tasks_mutex;
+	pthread_cond_t tasks_avail;
+
+	/** Taboo-list for collision avoidance */
+	char *cells_taboo;
+
+	/** Id of #runner owning each cell. */
+	char *cells_owner;
+
+	/** Counter for the number of swaps in every step. */
+	int nr_swaps, nr_stalls;
+
+	/** Array of pointers to the individual parts, sorted by their ID. */
+	struct part **partlist;
+
+	/** Array of pointers to the #cell of individual parts, sorted by their ID. */
+	struct cell **celllist;
+
+	/** Number of parts in this space and size of the buffers partlist and celllist. */
+	int nr_parts, size_parts;
+
+	/** Trigger re-building the cells/sorts. */
+	int verlet_rebuild;
+
+	/** The maximum particle displacement over all cells. */
+	FPTYPE maxdx;
+
+	/** Potential energy collected by the space itself. */
+	double epot, epot_nonbond, epot_bond, epot_angle, epot_dihedral, epot_exclusion;
+
+} space;
+
+
 /* associated functions */
 int space_init ( struct space *s , const double *origin , const double *dim , double *L , double cutoff , unsigned int period );
 int space_getsid ( struct space *s , struct cell **ci , struct cell **cj , FPTYPE *shift );

@@ -34,13 +34,13 @@ extern int exclusion_err;
 
 
 /** The exclusion structure */
-struct exclusion {
+typedef struct exclusion {
 
-    /* ids of particles involved */
-    int i, j;
-    
-    };
-    
+	/* ids of particles involved */
+	int i, j;
+
+} exclusion;
+
 
 /* associated functions */
 int exclusion_eval ( struct exclusion *b , int N , struct engine *e , double *epot_out );

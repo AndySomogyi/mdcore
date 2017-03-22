@@ -34,16 +34,16 @@ extern int angle_err;
 
 
 /** The angle structure */
-struct angle {
+typedef struct angle {
 
-    /* ids of particles involved */
-    int i, j, k;
-    
-    /* id of the potential. */
-    int pid;
-    
-    };
-    
+	/* ids of particles involved */
+	int i, j, k;
+
+	/* id of the potential. */
+	int pid;
+
+} angle;
+
 
 /* associated functions */
 int angle_eval ( struct angle *a , int N , struct engine *e , double *epot_out );

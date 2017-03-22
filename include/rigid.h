@@ -42,28 +42,28 @@ extern int rigid_err;
 
 
 /** The rigid structure */
-struct rigid {
+typedef struct rigid {
 
-    /** Nr of parts involved. */
-    int nr_parts;
+	/** Nr of parts involved. */
+	int nr_parts;
 
-    /** ids of particles involved */
-    int parts[ rigid_maxparts ];
-    
-    /** Nr of constraints involved. */
-    int nr_constr;
-    
-    /** The constraints themselves. */
-    struct {
-        int i, j;
-        double d2;
-        } constr[ rigid_maxconstr ];
-        
-    /** The constraint shuffle matrix. */
-    float a[ rigid_maxconstr*rigid_maxconstr ];
-    
-    };
-    
+	/** ids of particles involved */
+	int parts[ rigid_maxparts ];
+
+	/** Nr of constraints involved. */
+	int nr_constr;
+
+	/** The constraints themselves. */
+	struct {
+		int i, j;
+		double d2;
+	} constr[ rigid_maxconstr ];
+
+	/** The constraint shuffle matrix. */
+	float a[ rigid_maxconstr*rigid_maxconstr ];
+
+} rigid;
+
 
 /* associated functions */
 int rigid_eval_shake ( struct rigid *r , int N , struct engine *e );

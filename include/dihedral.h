@@ -35,16 +35,16 @@ extern int dihedral_err;
 
 
 /** The dihedral structure */
-struct dihedral {
+typedef struct dihedral {
 
-    /* ids of particles involved */
-    int i, j, k, l;
-    
-    /* id of the potential. */
-    int pid;
-    
-    };
-    
+	/* ids of particles involved */
+	int i, j, k, l;
+
+	/* id of the potential. */
+	int pid;
+
+} dihedral;
+
 
 /* associated functions */
 int dihedral_eval ( struct dihedral *d , int N , struct engine *e , double *epot_out );

@@ -36,22 +36,22 @@ MDCORE_BEGIN_DECLS
 
 /** Task types. */
 enum {
-    task_type_none = 0,
-    task_type_self,
-    task_type_pair,
-    task_type_sort,
-    task_type_bonded,
-    task_type_count
-    };
+	task_type_none = 0,
+	task_type_self,
+	task_type_pair,
+	task_type_sort,
+	task_type_bonded,
+	task_type_count
+};
 
 
 /** Task subtypes. */
 enum {
-    task_subtype_none = 0,
-    task_subtype_real,
-    task_subtype_spme,
-    task_subtype_count
-    };
+	task_subtype_none = 0,
+	task_subtype_real,
+	task_subtype_spme,
+	task_subtype_count
+};
 
 
 /** ID of the last error */
@@ -59,29 +59,29 @@ extern int task_err;
 
 
 /** The task structure */
-struct task {
+typedef struct task {
 
-    /** Task type/subtype. */
-    short int type, subtype;
-    
-    /** Wait counters. */
-    int wait;
-    
-    /** Task flags. */
-    int flags;
+	/** Task type/subtype. */
+	short int type, subtype;
 
-    /** Indices of the cells/domain involved. */
-    int i, j;
-    
-    /** Nr of task that this task unlocks. */
-    int nr_unlock;
-    
-    /** List of task that this task unlocks (dependencies). */
-    struct task *unlock[ task_max_unlock ];
-    
-    };
-    
-    
+	/** Wait counters. */
+	int wait;
+
+	/** Task flags. */
+	int flags;
+
+	/** Indices of the cells/domain involved. */
+	int i, j;
+
+	/** Nr of task that this task unlocks. */
+	int nr_unlock;
+
+	/** List of task that this task unlocks (dependencies). */
+	struct task *unlock[ task_max_unlock ];
+
+} task;
+
+
 /* associated functions */
 int task_addunlock ( struct task *ta , struct task *tb );
 

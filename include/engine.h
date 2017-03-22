@@ -125,7 +125,7 @@ extern char *engine_err_msg[];
 /** 
  * The #engine structure. 
  */
-struct engine {
+typedef struct engine {
 
 	/** Some flags controlling how this engine works. */
 	unsigned int flags;
@@ -251,13 +251,13 @@ struct engine {
 	/** Bonded sets. */
 	struct engine_set *sets;
 	int nr_sets;
-};
+} engine;
 
 
 /**
  * Structure storing grouped sets of bonded interactions.
  */
-struct engine_set {
+typedef struct engine_set {
 
 	/* Counts of the different interaction types. */
 	int nr_bonds, nr_angles, nr_dihedrals, nr_exclusions, weight;
@@ -274,20 +274,20 @@ struct engine_set {
 	/* IDs of the sets with which this set conflicts. */
 	int *confl;
 
-};
+} engine_set;
 
 
 /**
  * Structure storing which cells to send/receive to/from another node.
  */
-struct engine_comm {
+typedef struct engine_comm {
 
 	/* Size and count of the cellids. */
 	int count, size;
 
 	int *cellid;
 
-};
+} engine_comm;
 
 
 /* associated functions */

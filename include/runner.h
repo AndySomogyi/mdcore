@@ -60,106 +60,106 @@
 
 /** Timers. */
 enum {
-    runner_timer_queue = 0,
-    runner_timer_pair,
-    runner_timer_self,
-    runner_timer_sort,
-    runner_timer_count
-    };
+	runner_timer_queue = 0,
+	runner_timer_pair,
+	runner_timer_self,
+	runner_timer_sort,
+	runner_timer_count
+};
 extern ticks runner_timers[];
 #ifdef TIMER
-    #define TIMER_TIC_ND tic = getticks();
-    #define TIMER_TIC2_ND ticks tic2 = getticks();
-    #define TIMER_TIC ticks tic = getticks();
-    #define TIMER_TOC(t) timers_toc( t , tic )
-    #define TIMER_TIC2 ticks tic2 = getticks();
-    #define TIMER_TOC2(t) timers_toc( t , tic2 )
-    #ifndef INLINE
-    # if __GNUC__ && !__GNUC_STDC_INLINE__
-    #  define INLINE extern inline
-    # else
-    #  define INLINE inline
-    # endif
-    #endif
-    INLINE static ticks timers_toc ( int t , ticks tic ) {
-        ticks d = (getticks() - tic);
-        __sync_add_and_fetch( &runner_timers[t] , d );
-        return d;
-        }
+#define TIMER_TIC_ND tic = getticks();
+#define TIMER_TIC2_ND ticks tic2 = getticks();
+#define TIMER_TIC ticks tic = getticks();
+#define TIMER_TOC(t) timers_toc( t , tic )
+#define TIMER_TIC2 ticks tic2 = getticks();
+#define TIMER_TOC2(t) timers_toc( t , tic2 )
+#ifndef INLINE
+# if __GNUC__ && !__GNUC_STDC_INLINE__
+#  define INLINE extern inline
+# else
+#  define INLINE inline
+# endif
+#endif
+INLINE static ticks timers_toc ( int t , ticks tic ) {
+	ticks d = (getticks() - tic);
+	__sync_add_and_fetch( &runner_timers[t] , d );
+	return d;
+}
 #else
-    #define TIMER_TIC_ND
-    #define TIMER_TIC
-    #define TIMER_TOC(t)
-    #define TIMER_TIC2
-    #define TIMER_TOC2(t)
+#define TIMER_TIC_ND
+#define TIMER_TIC
+#define TIMER_TOC(t)
+#define TIMER_TIC2
+#define TIMER_TOC2(t)
 #endif
 
 MDCORE_BEGIN_DECLS
 
-    
+
 /* the last error */
 extern int runner_err;
 
 
 /* The fifo-queue for dispatching. */
-struct runner_fifo {
+typedef struct runner_fifo {
 
-    /* Access mutex and condition signal for blocking use. */
+	/* Access mutex and condition signal for blocking use. */
 	pthread_mutex_t mutex;
 	pthread_cond_t cond;
-    
-    /* Counters. */
-    int first, last, size, count;
-    
-    /* The FIFO data. */
-    int *data;
-    
-    };
 
-    
+	/* Counters. */
+	int first, last, size, count;
+
+	/* The FIFO data. */
+	int *data;
+
+} runner_fifo;
+
+
 
 /* the runner structure */
-struct runner {
+typedef struct runner {
 
-    /* the engine with which i am associated */
-    struct engine *e;
-    
-    /* this runner's id */
-    int id;
-    
-    /* my thread */
-    pthread_t thread;
-    
-    #ifdef CELL
-    
-        /* the SPE context */
-        spe_context_ptr_t spe;
-        pthread_t spe_thread;
-        
-        /* the (re-)entry point */
-        unsigned int entry;
-        
-        /* the initialization data */
-        void *data;
-        
-        /* the compacted cell list */
-        struct celldata *celldata;
-        
-    #endif
-    
-    /** ID of the last error on this runner. */
-    int err;
-    
-    /** Accumulated potential energy by this runner. */
-    double epot;
-    
-    };
-    
+	/* the engine with which i am associated */
+	struct engine *e;
+
+	/* this runner's id */
+	int id;
+
+	/* my thread */
+	pthread_t thread;
+
 #ifdef CELL
-    struct celldata {
-        int ni;
-        unsigned long long ai;
-        };
+
+	/* the SPE context */
+	spe_context_ptr_t spe;
+	pthread_t spe_thread;
+
+	/* the (re-)entry point */
+	unsigned int entry;
+
+	/* the initialization data */
+	void *data;
+
+	/* the compacted cell list */
+	struct celldata *celldata;
+
+#endif
+
+	/** ID of the last error on this runner. */
+	int err;
+
+	/** Accumulated potential energy by this runner. */
+	double epot;
+
+} runner;
+
+#ifdef CELL
+struct celldata {
+	int ni;
+	unsigned long long ai;
+};
 #endif
 
 

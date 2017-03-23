@@ -8,6 +8,53 @@
 #ifndef INCLUDE_MDCORE_CONFIG_H_
 #define INCLUDE_MDCORE_CONFIG_H_
 
+/* Global defines. */
+#ifndef FPTYPE_DEFINED
+    #ifdef FPTYPE_DOUBLE
+        /** The default basic type is double. */
+        typedef double FPTYPE;
+        #define FPTYPE_EPSILON DBL_EPSILON
+        #ifndef FPTYPE_DOUBLE
+            #define FPTYPE_DOUBLE
+        #endif
+        #define FPTYPE_ONE 1.0
+        #define FPTYPE_TWO 2.0
+        #define FPTYPE_ZERO 0.0
+        #define FPTYPE_SQRT sqrt
+        #define FPTYPE_FMAX fmax
+        #define FPTYPE_FMIN fmin
+        #define FPTYPE_FABS fabs
+    #else
+        /** The basic type is set to float. */
+        typedef float FPTYPE;
+        #define FPTYPE_EPSILON FLT_EPSILON
+        #define FPTYPE_ONE 1.0f
+        #define FPTYPE_ZERO 0.0f
+        #define FPTYPE_TWO 2.0f
+        #define FPTYPE_SQRT sqrtf
+        #define FPTYPE_FMAX fmaxf
+        #define FPTYPE_FMIN fminf
+        #define FPTYPE_FABS fabsf
+        #ifndef FPTYPE_SINGLE
+            #define FPTYPE_SINGLE
+        #endif
+    #endif
+    #define FPTYPE_DEFINED
+#endif
+
+
+/* Get the inlining right. */
+#ifndef INLINE
+# if __GNUC__ && !__GNUC_STDC_INLINE__
+#  define INLINE extern inline
+# else
+#  define INLINE inline
+# endif
+#endif
+
+
+
+
 /* Support AVX (Advanced Vector Extensions) instructions */
 #undef HAVE_AVX
 

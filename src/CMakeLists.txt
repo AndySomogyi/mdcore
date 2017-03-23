@@ -25,27 +25,27 @@ include_directories(${FFTW_INCLUDES})
 link_libraries(${FFTW_LIBRARIES})
 
 set(PUBLIC_HEADERS
-  "${CMAKE_SOURCE_DIR}/include/errs.h"
-  "${CMAKE_SOURCE_DIR}/include/fptype.h"
-  "${CMAKE_SOURCE_DIR}/include/lock.h"
-  "${CMAKE_SOURCE_DIR}/include/part.h"
-  "${CMAKE_SOURCE_DIR}/include/potential.h"
-  "${CMAKE_SOURCE_DIR}/include/cell.h"
-  "${CMAKE_SOURCE_DIR}/include/spme.h"
-  "${CMAKE_SOURCE_DIR}/include/task.h"
-  "${CMAKE_SOURCE_DIR}/include/queue.h"
-  "${CMAKE_SOURCE_DIR}/include/space.h"
-  "${CMAKE_SOURCE_DIR}/include/runner.h"
-  "${CMAKE_SOURCE_DIR}/include/engine.h"
-  "${CMAKE_SOURCE_DIR}/include/bond.h"
-  "${CMAKE_SOURCE_DIR}/include/rigid.h"
-  "${CMAKE_SOURCE_DIR}/include/angle.h"
-  "${CMAKE_SOURCE_DIR}/include/exclusion.h"
-  "${CMAKE_SOURCE_DIR}/include/dihedral.h"
-  "${CMAKE_SOURCE_DIR}/include/cycle.h"
+  "${MDCORE_SOURCE_DIR}/include/errs.h"
+  "${MDCORE_SOURCE_DIR}/include/lock.h"
+  "${MDCORE_SOURCE_DIR}/include/part.h"
+  "${MDCORE_SOURCE_DIR}/include/potential.h"
+  "${MDCORE_SOURCE_DIR}/include/cell.h"
+  "${MDCORE_SOURCE_DIR}/include/spme.h"
+  "${MDCORE_SOURCE_DIR}/include/task.h"
+  "${MDCORE_SOURCE_DIR}/include/queue.h"
+  "${MDCORE_SOURCE_DIR}/include/space.h"
+  "${MDCORE_SOURCE_DIR}/include/runner.h"
+  "${MDCORE_SOURCE_DIR}/include/engine.h"
+  "${MDCORE_SOURCE_DIR}/include/bond.h"
+  "${MDCORE_SOURCE_DIR}/include/rigid.h"
+  "${MDCORE_SOURCE_DIR}/include/angle.h"
+  "${MDCORE_SOURCE_DIR}/include/exclusion.h"
+  "${MDCORE_SOURCE_DIR}/include/dihedral.h"
+  "${MDCORE_SOURCE_DIR}/include/cycle.h"
   )
 
 set(PRIVATE_HEADERS
+  "fptype.h"
   "btree.h"
   "mainpage.h"
   "potential_eval.h"
@@ -53,7 +53,7 @@ set(PRIVATE_HEADERS
   )
 
 #add_library(${_target} ${ARGN} ${_header_list})
-#target_include_directories(${_target} PRIVATE "${CMAKE_SOURCE_DIR}/include")
+#target_include_directories(${_target} PRIVATE "${MDCORE_SOURCE_DIR}/include")
 
 
 
@@ -124,15 +124,15 @@ endif()
 function(add_mdcore_single)
   set(MDCORE_BUILD_SINGLE YES)
   set(MDCORE_CONFIG_FILE "mdcore_single_config.h")
-  configure_file("${CMAKE_SOURCE_DIR}/include/mdcore.h.in" "${CMAKE_BINARY_DIR}/include/mdcore_single.h")
-  configure_file("${CMAKE_SOURCE_DIR}/include/mdcore_config.h.in" "${CMAKE_BINARY_DIR}/include/mdcore_single_config.h")
-  include_directories(${CMAKE_CURRENT_BINARY_DIR})
+  configure_file("${MDCORE_SOURCE_DIR}/include/mdcore.h.in" "${MDCORE_BINARY_DIR}/include/mdcore_single.h")
+  configure_file("${MDCORE_SOURCE_DIR}/include/mdcore_config.h.in" "${MDCORE_BINARY_DIR}/include/mdcore_single_config.h")
+#  include_directories(${CMAKE_CURRENT_BINARY_DIR})
 
   set(SINGLE_HEADERS
     ${PUBLIC_HEADERS}
     ${PRIVATE_HEADERS}
-    "${CMAKE_BINARY_DIR}/include/mdcore_single.h"
-    "${CMAKE_BINARY_DIR}/include/mdcore_single_config.h"
+    "${MDCORE_BINARY_DIR}/include/mdcore_single.h"
+    "${MDCORE_BINARY_DIR}/include/mdcore_single_config.h"
     )
   
   message("SINGLE_HEADERS: ${SINGLE_HEADERS}")
@@ -140,6 +140,10 @@ function(add_mdcore_single)
   source_group("Includes" FILES ${SINGLE_HEADERS})
   add_library(mdcore_single STATIC ${SOURCES} ${SINGLE_HEADERS})
   target_compile_definitions(mdcore_single PUBLIC MDCORE_SINGLE)
+
+  target_include_directories(mdcore_single INTERFACE ${MDCORE_INCLUDE_DIR})
+
+  message("setting mdcore_single interface includes: ${MDCORE_INCLUDE_DIR}")
 endfunction(add_mdcore_single)
 
 # alwasy build the single precision version

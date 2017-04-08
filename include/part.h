@@ -43,7 +43,9 @@ extern int part_err;
 
 
 /**
- * The #part data structure.
+ * The part data structure.
+ *
+ * Instance vars for each particle.
  *
  * Note that the arrays for @c x, @c v and @c f are 4 entries long for
  * propper alignment.
@@ -75,7 +77,12 @@ typedef struct part {
 
 
 
-/** Structure containing information on each particle species. */
+/**
+ * Structure containing information on each particle species.
+ *
+ * This is only a definition for the particle *type*, not the actual
+ * instance vars like pos, vel, which are stored in part.
+ */
 typedef struct part_type {
 
 	/** ID of this type */

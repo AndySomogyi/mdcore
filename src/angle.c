@@ -43,10 +43,10 @@
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
+#include <particle.h>
 #include "potential.h"
 #include "potential_eval.h"
-#include "cell.h"
+#include <space_cell.h>
 #include "space.h"
 #include "engine.h"
 #include "angle.h"
@@ -83,8 +83,8 @@ int angle_eval ( struct angle *a , int N , struct engine *e , double *epot_out )
     int aid, pid, pjd, pkd, k, l, *loci, *locj, *lock, shift;
     double h[3], epot = 0.0;
     struct space *s;
-    struct part *pi, *pj, *pk, **partlist;
-    struct cell **celllist;
+    struct particle *pi, *pj, *pk, **partlist;
+    struct space_cell **celllist;
     struct potential *pot;
     FPTYPE xi[3], xj[3], xk[3], dxi[3] , dxk[3], ctheta, wi, wk;
     FPTYPE rji[3], rjk[3], inji, injk, dprod;
@@ -126,7 +126,7 @@ int angle_eval ( struct angle *a , int N , struct engine *e , double *epot_out )
             continue;
         
         /* Skip if all three are ghosts. */
-        if ( ( pi->flags & part_flag_ghost ) && ( pj->flags & part_flag_ghost ) && ( pk->flags & part_flag_ghost ) )
+        if ( ( pi->flags & PARTICLE_FLAG_GHOST ) && ( pj->flags & PARTICLE_FLAG_GHOST ) && ( pk->flags & PARTICLE_FLAG_GHOST ) )
             continue;
             
         /* Get the potential. */
@@ -328,8 +328,8 @@ int angle_evalf ( struct angle *a , int N , struct engine *e , FPTYPE *f , doubl
     int aid, pid, pjd, pkd, k, *loci, *locj, *lock, shift;
     double h[3], epot = 0.0;
     struct space *s;
-    struct part *pi, *pj, *pk, **partlist;
-    struct cell **celllist;
+    struct particle *pi, *pj, *pk, **partlist;
+    struct space_cell **celllist;
     struct potential *pot;
     FPTYPE xi[3], xj[3], xk[3], dxi[3] , dxk[3], ctheta, wi, wk;
     register FPTYPE t1, t10, t11, t12, t13, t21, t22, t23, t24, t25, t26, t27, t3,
@@ -372,7 +372,7 @@ int angle_evalf ( struct angle *a , int N , struct engine *e , FPTYPE *f , doubl
             continue;
         
         /* Skip if all three are ghosts. */
-        if ( ( pi->flags & part_flag_ghost ) && ( pj->flags & part_flag_ghost ) && ( pk->flags & part_flag_ghost ) )
+        if ( ( pi->flags & PARTICLE_FLAG_GHOST ) && ( pj->flags & PARTICLE_FLAG_GHOST ) && ( pk->flags & PARTICLE_FLAG_GHOST ) )
             continue;
             
         /* Get the potential. */

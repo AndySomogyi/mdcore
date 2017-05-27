@@ -87,8 +87,8 @@ int main ( int argc , char *argv[] ) {
     FILE *dump;
     char fname[100];
     struct {
-        struct part *p;
-        struct cell *c;
+        struct particle *p;
+        struct unit_cell *c;
         } globloc[nr_parts];
     double old_O[3], old_H1[3], old_H2[3], new_O[3], new_H1[3], new_H2[3];
     double v_OH1[3], v_OH2[3], v_HH[3], ldim[3], vp_O[3], vp_H1[3], vp_H2[3];
@@ -96,8 +96,8 @@ int main ( int argc , char *argv[] ) {
     double vcom_tot[6], vcom_tot_x, vcom_tot_y, vcom_tot_z, ekin, epot, vcom[3], w, v2;
     ticks tic, toc, tic_step, toc_step, timers[10];
     double itpms = 1000.0 / CPU_TPS;
-    struct part *p_O, *p_H1, *p_H2, *p;
-    struct cell *c_O, *c_H1, *c_H2;
+    struct particle *p_O, *p_H1, *p_H2, *p;
+    struct unit_cell *c_O, *c_H1, *c_H2;
     int verbose = 0;
     
     

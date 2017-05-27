@@ -40,8 +40,8 @@
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
-#include "cell.h"
+#include <particle.h>
+#include <space_cell.h>
 #include "task.h"
 #include "space.h"
 
@@ -77,10 +77,10 @@ char *space_err_msg[9] = {
  * @return The sort ID of both cells, which may be swapped.
  */
  
-int space_getsid ( struct space *s , struct cell **ci , struct cell **cj , FPTYPE *shift ) {
+int space_getsid ( struct space *s , struct space_cell **ci , struct space_cell **cj , FPTYPE *shift ) {
 
     int k, sid;
-    struct cell *temp;
+    struct space_cell *temp;
     FPTYPE lshift[3];
     
     /* Shift vector provided? */
@@ -236,8 +236,8 @@ int space_shuffle ( struct space *s ) {
 
     int k, cid, pid, delta[3];
     FPTYPE h[3];
-    struct cell *c, *c_dest;
-    struct part *p;
+    struct space_cell *c, *c_dest;
+    struct particle *p;
     
     /* Get a local copy of h. */
     for ( k = 0 ; k < 3 ; k++ )
@@ -264,7 +264,7 @@ int space_shuffle ( struct space *s ) {
 
 	            if ( c_dest->flags & cell_flag_marked ) {
                     pthread_mutex_lock(&c_dest->cell_mutex);
-                    cell_add_incomming( c_dest , p );
+                    space_cell_add_incomming( c_dest , p );
 	                pthread_mutex_unlock(&c_dest->cell_mutex);
                     s->celllist[ p->id ] = c_dest;
                     }
@@ -308,8 +308,8 @@ int space_shuffle_local ( struct space *s ) {
 
     int k, cid, pid, delta[3];
     FPTYPE h[3];
-    struct cell *c, *c_dest;
-    struct part *p;
+    struct space_cell *c, *c_dest;
+    struct particle *p;
     
     /* Get a local copy of h. */
     for ( k = 0 ; k < 3 ; k++ )
@@ -337,7 +337,7 @@ int space_shuffle_local ( struct space *s ) {
 
 	            if ( c_dest->flags & cell_flag_marked ) {
                     pthread_mutex_lock(&c_dest->cell_mutex);
-                    cell_add_incomming( c_dest , p );
+                    space_cell_add_incomming( c_dest , p );
 	                pthread_mutex_unlock(&c_dest->cell_mutex);
                     s->celllist[ p->id ] = c_dest;
                     }
@@ -379,11 +379,11 @@ int space_shuffle_local ( struct space *s ) {
  * data in @c p is overwritten and @c x is used.
  */
 
-int space_addpart ( struct space *s , struct part *p , double *x ) {
+int space_addpart ( struct space *s , struct particle *p , double *x ) {
 
     int k, ind[3];
-    struct part **temp;
-    struct cell **tempc, *c;
+    struct particle **temp;
+    struct space_cell **tempc, *c;
 
     /* check input */
     if ( s == NULL || p == NULL || x == NULL )
@@ -392,12 +392,12 @@ int space_addpart ( struct space *s , struct part *p , double *x ) {
     /* do we need to extend the partlist? */
     if ( s->nr_parts == s->size_parts ) {
         s->size_parts += space_partlist_incr;
-        if ( ( temp = (struct part **)malloc( sizeof(struct part *) * s->size_parts ) ) == NULL )
+        if ( ( temp = (struct particle **)malloc( sizeof(struct particle *) * s->size_parts ) ) == NULL )
             return error(space_err_malloc);
-        if ( ( tempc = (struct cell **)malloc( sizeof(struct cell *) * s->size_parts ) ) == NULL )
+        if ( ( tempc = (struct space_cell **)malloc( sizeof(struct space_cell *) * s->size_parts ) ) == NULL )
             return error(space_err_malloc);
-        memcpy( temp , s->partlist , sizeof(struct part *) * s->nr_parts );
-        memcpy( tempc , s->celllist , sizeof(struct cell *) * s->nr_parts );
+        memcpy( temp , s->partlist , sizeof(struct particle *) * s->nr_parts );
+        memcpy( tempc , s->celllist , sizeof(struct space_cell *) * s->nr_parts );
         free( s->partlist );
         free( s->celllist );
         s->partlist = temp;
@@ -424,7 +424,7 @@ int space_addpart ( struct space *s , struct part *p , double *x ) {
         p->x[k] = x[k] - c->origin[k];
         
     /* delegate the particle to the cell */
-    if ( ( s->partlist[p->id] = cell_add( c , p , s->partlist ) ) == NULL )
+    if ( ( s->partlist[p->id] = space_cell_add( c , p , s->partlist ) ) == NULL )
         return error(space_err_cell);
     s->celllist[p->id] = c;
     
@@ -532,7 +532,7 @@ int space_init ( struct space *s , const double *origin , const double *dim , do
     int i, j, k, l[3], ii, jj, kk;
     int id1, id2, sid;
     double o[3], lh[3];
-    struct cell *ci, *cj;
+    struct space_cell *ci, *cj;
 
     /* check inputs */
     if ( s == NULL || origin == NULL || dim == NULL || L == NULL )
@@ -557,7 +557,7 @@ int space_init ( struct space *s , const double *origin , const double *dim , do
         
     /* allocate the cells */
     s->nr_cells = s->cdim[0] * s->cdim[1] * s->cdim[2];
-    s->cells = (struct cell *)malloc( sizeof(struct cell) * s->nr_cells );
+    s->cells = (struct space_cell *)malloc( sizeof(struct space_cell) * s->nr_cells );
     if ( s->cells == NULL )
         return error(space_err_malloc);
         
@@ -573,7 +573,7 @@ int space_init ( struct space *s , const double *origin , const double *dim , do
             o[1] = origin[1] + l[1] * s->h[1];
             for ( l[2] = 0 ; l[2] < s->cdim[2] ; l[2]++ ) {
                 o[2] = origin[2] + l[2] * s->h[2];
-                if ( cell_init( &(s->cells[space_cellid(s,l[0],l[1],l[2])]) , l , o , s->h ) < 0 )
+                if ( space_cell_init( &(s->cells[space_cellid(s,l[0],l[1],l[2])]) , l , o , s->h ) < 0 )
                     return error(space_err_cell);
                 }
             }
@@ -759,9 +759,9 @@ int space_init ( struct space *s , const double *origin , const double *dim , do
     bzero( s->cells_owner , sizeof(char) * s->nr_cells );
     
     /* allocate the initial partlist */
-    if ( ( s->partlist = (struct part **)malloc( sizeof(struct part *) * space_partlist_incr ) ) == NULL )
+    if ( ( s->partlist = (struct particle **)malloc( sizeof(struct particle *) * space_partlist_incr ) ) == NULL )
         return error(space_err_malloc);
-    if ( ( s->celllist = (struct cell **)malloc( sizeof(struct cell *) * space_partlist_incr ) ) == NULL )
+    if ( ( s->celllist = (struct space_cell **)malloc( sizeof(struct space_cell *) * space_partlist_incr ) ) == NULL )
         return error(space_err_malloc);
     s->nr_parts = 0;
     s->size_parts = space_partlist_incr;

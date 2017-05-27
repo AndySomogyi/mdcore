@@ -84,7 +84,7 @@ int main ( int argc , char *argv[] ) {
     double vcom_tot[7], vcom_tot_x, vcom_tot_y, vcom_tot_z, ekin, epot, vcom[3], w, v2;
     ticks tic, tic_step, tic_temp, toc;
     double itpms = 1000.0 / CPU_TPS;
-    struct part *p_O, *p_H1, *p_H2;
+    struct particle *p_O, *p_H1, *p_H2;
     int nr_nodes = 1, count = 0;
     double L[] = { cutoff , cutoff , cutoff };
     

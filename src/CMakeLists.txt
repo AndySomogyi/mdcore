@@ -27,9 +27,10 @@ link_libraries(${FFTW_LIBRARIES})
 set(PUBLIC_HEADERS
   "${MDCORE_SOURCE_DIR}/include/errs.h"
   "${MDCORE_SOURCE_DIR}/include/lock.h"
-  "${MDCORE_SOURCE_DIR}/include/part.h"
+  "${MDCORE_SOURCE_DIR}/include/particle.h"
   "${MDCORE_SOURCE_DIR}/include/potential.h"
-  "${MDCORE_SOURCE_DIR}/include/cell.h"
+  "${MDCORE_SOURCE_DIR}/include/platform.h"
+  "${MDCORE_SOURCE_DIR}/include/space_cell.h"
   "${MDCORE_SOURCE_DIR}/include/spme.h"
   "${MDCORE_SOURCE_DIR}/include/task.h"
   "${MDCORE_SOURCE_DIR}/include/queue.h"
@@ -42,10 +43,11 @@ set(PUBLIC_HEADERS
   "${MDCORE_SOURCE_DIR}/include/exclusion.h"
   "${MDCORE_SOURCE_DIR}/include/dihedral.h"
   "${MDCORE_SOURCE_DIR}/include/cycle.h"
+  "${MDCORE_SOURCE_DIR}/include/fptype.h"
+  "${MDCORE_SOURCE_DIR}/include/config.h"
   )
 
 set(PRIVATE_HEADERS
-  "fptype.h"
   "btree.h"
   "mainpage.h"
   "potential_eval.h"
@@ -61,8 +63,8 @@ set(PRIVATE_HEADERS
 
 # Both precisions have the same sources.
 SET(SOURCES
-  cell.c
-  part.c
+  space_cell.c
+  particle.c
   runner.c
   engine.c
   potential.c

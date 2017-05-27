@@ -18,8 +18,8 @@
  * 
  ******************************************************************************/
 
-#ifndef INCLUDE_CELL_H_
-#define INCLUDE_CELL_H_
+#ifndef INCLUDE_SPACE_CELL_H_
+#define INCLUDE_SPACE_CELL_H_
 
 #include "platform.h"
 #include "pthread.h"
@@ -37,11 +37,7 @@
 #define cell_incr                       10
 
 /** Alignment when allocating parts. */
-#ifdef CELL
-#define cell_partalign                  128
-#else
 #define cell_partalign                  64
-#endif
 
 /** Cell flags */
 #define cell_flag_none                  0
@@ -65,12 +61,16 @@ extern int cell_err;
 
 
 /**
- * @brief the cell structure
+ * @brief the space_cell structure
  *
- * The cell represents a rectangular region of space, and physically
- * stores all particle data.
+ * The space_cell represents a rectangular region of space, and physically
+ * stores all particle data. A set of cells form a uniform rectangular grid.
+ *
+ * Simulation box divided into cells with size equal to or slightly larger than
+ * the largest non-bonded force cutoff distance. Each particle only interacts
+ * with others in its own cell or adjacent cells
  */
-typedef struct cell {
+typedef struct space_cell {
 
 	/* some flags */
 	unsigned int flags;
@@ -91,13 +91,13 @@ typedef struct cell {
 	int size, count;
 
 	/* the particle buffer */
-	struct part *parts;
+	struct particle *parts;
 
 	/* buffer to store the potential energy */
 	double epot;
 
 	/* a buffer to store incomming parts. */
-	struct part *incomming;
+	struct particle *incomming;
 	int incomming_size, incomming_count;
 
 	/* Mutex for synchronized cell access. */
@@ -120,18 +120,19 @@ typedef struct cell {
 	/*ID of the GPU this cell belongs to. */
 	int GPUID;
 
-} cell;
+} space_cell;
+
 
 
 /* associated functions */
-int cell_init ( struct cell *c , int *loc , double *origin , double *dim );
-struct part *cell_add ( struct cell *c , struct part *p , struct part **partlist );
-struct part *cell_add_incomming ( struct cell *c , struct part *p );
-int cell_add_incomming_multiple ( struct cell *c , struct part *p , int count );
-int cell_welcome ( struct cell *c , struct part **partlist );
-int cell_load ( struct cell *c , struct part *parts , int nr_parts , struct part **partlist , struct cell **celllist );
-int cell_flush ( struct cell *c , struct part **partlist , struct cell **celllist );
+int space_cell_init ( struct space_cell *c , int *loc , double *origin , double *dim );
+struct particle *space_cell_add ( struct space_cell *c , struct particle *p , struct particle **partlist );
+struct particle *space_cell_add_incomming ( struct space_cell *c , struct particle *p );
+int space_cell_add_incomming_multiple ( struct space_cell *c , struct particle *p , int count );
+int space_cell_welcome ( struct space_cell *c , struct particle **partlist );
+int space_cell_load ( struct space_cell *c , struct particle *parts , int nr_parts , struct particle **partlist , struct space_cell **celllist );
+int space_cell_flush ( struct space_cell *c , struct particle **partlist , struct space_cell **celllist );
 
 MDCORE_END_DECLS
 
-#endif // INCLUDE_CELL_H_
+#endif // INCLUDE_SPACE_CELL_H_

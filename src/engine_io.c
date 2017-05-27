@@ -25,9 +25,6 @@
 #include <math.h>
 #include <float.h>
 #include <string.h>
-#ifdef CELL
-    #include <libspe2.h>
-#endif
 
 /* Include conditional headers. */
 #include "config.h"
@@ -43,8 +40,8 @@
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
-#include "cell.h"
+#include <particle.h>
+#include <space_cell.h>
 #include "space.h"
 #include "potential.h"
 #include "runner.h"
@@ -1237,7 +1234,7 @@ int engine_read_psf ( struct engine *e , int psf , int pdb ) {
     char type[100], typename[100], buff[100], *endptr;
     int pid, pjd, pkd, pld, j, k, n, id, *resids, *typeids, typelen, bufflen;
     double q, m, x[3];
-    struct part p;
+    struct particle p;
     
     /* Check inputs. */
     if ( e == NULL )
@@ -1513,7 +1510,7 @@ int engine_read_psf ( struct engine *e , int psf , int pdb ) {
         return error(engine_err_reader);
         
     /* Init the part data. */
-    bzero( &p , sizeof(struct part) );
+    bzero( &p , sizeof(struct particle) );
     pid = 0;
         
     /* Main loop. */
@@ -1571,7 +1568,7 @@ int engine_read_psf ( struct engine *e , int psf , int pdb ) {
             p.id = pid-1;
             p.vid = resids[pid-1];
             p.q = e->types[typeids[pid-1]].charge;
-            p.flags = part_flag_none;
+            p.flags = PARTICLE_FLAG_NONE;
             p.type = typeids[pid-1];
             if ( space_addpart( &e->s , &p , x ) < 0 )
                 return error(engine_err_space);
@@ -1620,8 +1617,8 @@ int engine_read_psf ( struct engine *e , int psf , int pdb ) {
 int engine_dump_PSF ( struct engine *e , FILE *psf , FILE *pdb , char *excl[] , int nr_excl ) {
 
     struct space *s;
-    struct cell *c;
-    struct part *p;
+    struct space_cell *c;
+    struct particle *p;
     int k, pid, bid, aid;
 
     /* Check inputs. */

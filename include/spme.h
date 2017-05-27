@@ -78,7 +78,7 @@ typedef struct spme {
 int spme_init ( struct spme *s , int *dim , float *h , float kappa );
 void spme_bspline ( float *x , int N , float *b , float *dbdx );
 int spme_doconv ( struct spme *s );
-void spme_iact ( struct spme *s , struct cell *cp , struct cell *cg );
+void spme_iact ( struct spme *s , struct space_cell *cp , struct space_cell *cg );
 
 MDCORE_END_DECLS
 #endif // INCLUDE_SPME_H_

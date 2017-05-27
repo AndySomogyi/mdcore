@@ -40,8 +40,8 @@
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
-#include "cell.h"
+#include <particle.h>
+#include <space_cell.h>
 #include "task.h"
 #include "space.h"
 #include "potential.h"

@@ -21,14 +21,14 @@
 /* include some standard header files */
 #include <stdlib.h>
 #include <math.h>
+#include <particle.h>
 
 /* include local headers */
 #include "fptype.h"
-#include "part.h"
 
 
 /** ID of the last error */
-int part_err = part_err_ok;
+int particle_err = PARTICLE_ERR_OK;
 
 
 /**
@@ -43,18 +43,18 @@ int part_err = part_err_ok;
  *
  */
 
-int part_init ( struct part *p , int vid , int type , unsigned int flags ) {
+int particle_init ( struct particle *p , int vid , int type , unsigned int flags ) {
 
     /* check inputs */
     if ( p == NULL )
-        return part_err = part_err_null;
-        
+        return particle_err = PARTICLE_ERR_NULL;
+
     /* Set the paticle data. */
     p->vid = vid;
     p->type = type;
     p->flags = flags;
-        
-    /* all is well... */
-    return part_err_ok;
 
-    }
+    /* all is well... */
+    return PARTICLE_ERR_OK;
+
+}

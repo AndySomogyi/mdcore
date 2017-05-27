@@ -43,9 +43,9 @@
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
+#include <particle.h>
 #include "potential.h"
-#include "cell.h"
+#include <space_cell.h>
 #include "space.h"
 #include "engine.h"
 #include "rigid.h"
@@ -81,8 +81,8 @@ char *rigid_err_msg[3] = {
 int rigid_eval_shake ( struct rigid *rs , int N , struct engine *e ) {
 
     int iter, rid, k, j, pid, pjd, nr_parts, nr_constr, shift;
-    struct part *p[rigid_maxparts], **partlist;
-    struct cell *c[rigid_maxparts], **celllist;
+    struct particle *p[rigid_maxparts], **partlist;
+    struct space_cell *c[rigid_maxparts], **celllist;
     struct rigid *r;
     double dt, idt;
     double xp[3*rigid_maxparts], xp_old[3*rigid_maxparts], h[3];
@@ -124,7 +124,7 @@ int rigid_eval_shake ( struct rigid *rs , int N , struct engine *e ) {
             continue;
             
         /* Are all the parts ghosts? */
-        for ( k = 0 ; k < nr_parts && (p[k]->flags & part_flag_ghost) ; k++ );
+        for ( k = 0 ; k < nr_parts && (p[k]->flags & PARTICLE_FLAG_GHOST) ; k++ );
         if ( k == nr_parts )
             continue;
             
@@ -279,8 +279,8 @@ int rigid_eval_shake ( struct rigid *rs , int N , struct engine *e ) {
 int rigid_eval_pshake ( struct rigid *rs , int N , struct engine *e , int a_update ) {
 
     int iter, rid, k, j, i, pid, pjd, nr_parts, nr_constr, shift;
-    struct part *p[rigid_maxparts], **partlist;
-    struct cell *c[rigid_maxparts], **celllist;
+    struct particle *p[rigid_maxparts], **partlist;
+    struct space_cell *c[rigid_maxparts], **celllist;
     struct rigid *r;
     double dt, idt;
     double xp[3*rigid_maxparts], xp_old[3*rigid_maxparts], h[3];
@@ -321,7 +321,7 @@ int rigid_eval_pshake ( struct rigid *rs , int N , struct engine *e , int a_upda
             continue;
             
         /* Are all the parts ghosts? */
-        for ( k = 0 ; k < nr_parts && (p[k]->flags & part_flag_ghost) ; k++ );
+        for ( k = 0 ; k < nr_parts && (p[k]->flags & PARTICLE_FLAG_GHOST) ; k++ );
         if ( k == nr_parts )
             continue;
             

@@ -31,11 +31,6 @@
 
 /* Include some conditional headers. */
 #include "config.h"
-#ifdef CELL
-    #include <libspe2.h>
-    #include <libmisc.h>
-    #define ceil128(v) (((v) + 127) & ~127)
-#endif
 #ifdef HAVE_SETAFFINITY
     #include <sched.h>
 #endif
@@ -48,21 +43,13 @@
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
-#include "cell.h"
+#include <particle.h>
+#include <space_cell.h>
 #include "space.h"
 #include "potential.h"
 #include "potential_eval.h"
 #include "engine.h"
 #include "runner.h"
-
-
-
-#ifdef CELL
-    /* the SPU executeable */
-    extern spe_program_handle_t runner_spu;
-#endif
-
 
 /* the error macro. */
 #define error(id)				( runner_err = errs_register( id , runner_err_msg[-(id)] , __LINE__ , __FUNCTION__ , __FILE__ ) )
@@ -89,12 +76,12 @@ extern unsigned int runner_rcount;
  * @sa #runner_sortedpair.
  */
 
-__attribute__ ((flatten)) int runner_dopair ( struct runner *r , struct cell *cell_i , struct cell *cell_j , int sid ) {
+__attribute__ ((flatten)) int runner_dopair ( struct runner *r , struct space_cell *cell_i , struct space_cell *cell_j , int sid ) {
 
-    struct part *part_i, *part_j;
+    struct particle *part_i, *part_j;
     struct space *s;
     int i, j, k;
-    struct part *parts_i, *parts_j;
+    struct particle *parts_i, *parts_j;
     struct potential *pot, **pots;
     struct engine *eng;
     int emt, pioff, dmaxdist, dnshift;
@@ -144,10 +131,10 @@ __attribute__ ((flatten)) int runner_dopair ( struct runner *r , struct cell *ce
     
     /* Make local copies of the parts if requested. */
     if ( r->e->flags & engine_flag_localparts ) {
-        parts_i = (struct part *)alloca( sizeof(struct part) * count_i );
-        memcpy( parts_i , cell_i->parts , sizeof(struct part) * count_i );
-        parts_j = (struct part *)alloca( sizeof(struct part) * count_j );
-        memcpy( parts_j , cell_j->parts , sizeof(struct part) * count_j );
+        parts_i = (struct particle *)alloca( sizeof(struct particle) * count_i );
+        memcpy( parts_i , cell_i->parts , sizeof(struct particle) * count_i );
+        parts_j = (struct particle *)alloca( sizeof(struct particle) * count_j );
+        memcpy( parts_j , cell_j->parts , sizeof(struct particle) * count_j );
         }
     else {
         parts_i = cell_i->parts;
@@ -339,13 +326,13 @@ __attribute__ ((flatten)) int runner_dopair ( struct runner *r , struct cell *ce
  * @return #runner_err_ok or <0 on error (see #runner_err)
  */
 
-__attribute__ ((flatten)) int runner_doself ( struct runner *r , struct cell *c ) {
+__attribute__ ((flatten)) int runner_doself ( struct runner *r , struct space_cell *c ) {
 
-    struct part *part_i, *part_j;
+    struct particle *part_i, *part_j;
     struct space *s;
     int count = 0;
     int i, j, k;
-    struct part *parts;
+    struct particle *parts;
     double epot = 0.0;
     struct potential *pot, **pots;
     struct engine *eng;
@@ -381,8 +368,8 @@ __attribute__ ((flatten)) int runner_doself ( struct runner *r , struct cell *c 
     
     /* Make local copies of the parts if requested. */
     if ( r->e->flags & engine_flag_localparts ) {
-        parts = (struct part *)alloca( sizeof(struct part) * count );
-        memcpy( parts , c->parts , sizeof(struct part) * count );
+        parts = (struct particle *)alloca( sizeof(struct particle) * count );
+        memcpy( parts , c->parts , sizeof(struct particle) * count );
         }
     else
         parts = c->parts;
@@ -560,14 +547,14 @@ __attribute__ ((flatten)) int runner_doself ( struct runner *r , struct cell *c 
  * @sa #runner_sortedpair.
  */
 
-__attribute__ ((flatten)) int runner_dopair_unsorted ( struct runner *r , struct cell *cell_i , struct cell *cell_j ) {
+__attribute__ ((flatten)) int runner_dopair_unsorted ( struct runner *r , struct space_cell *cell_i , struct space_cell *cell_j ) {
 
     int i, j, k, emt, pioff, count_i, count_j;
     FPTYPE cutoff2, r2, w, shift[3];
     FPTYPE *pif;
     double epot = 0.0;
     struct engine *eng;
-    struct part *part_i, *part_j, *parts_i, *parts_j;
+    struct particle *part_i, *part_j, *parts_i, *parts_j;
     struct potential *pot;
     struct space *s;
 #if defined(VECTORIZE)
@@ -604,11 +591,11 @@ __attribute__ ((flatten)) int runner_dopair_unsorted ( struct runner *r , struct
     if ( r->e->flags & engine_flag_localparts ) {
     
         /* set pointers to the particle lists */
-        parts_i = (struct part *)alloca( sizeof(struct part) * count_i );
-        memcpy( parts_i , cell_i->parts , sizeof(struct part) * count_i );
+        parts_i = (struct particle *)alloca( sizeof(struct particle) * count_i );
+        memcpy( parts_i , cell_i->parts , sizeof(struct particle) * count_i );
         if ( cell_i != cell_j ) {
-            parts_j = (struct part *)alloca( sizeof(struct part) * count_j );
-            memcpy( parts_j , cell_j->parts , sizeof(struct part) * count_j );
+            parts_j = (struct particle *)alloca( sizeof(struct particle) * count_j );
+            memcpy( parts_j , cell_j->parts , sizeof(struct particle) * count_j );
             }
         else
             parts_j = parts_i;

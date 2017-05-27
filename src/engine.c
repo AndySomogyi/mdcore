@@ -25,9 +25,6 @@
 #include <math.h>
 #include <float.h>
 #include <string.h>
-#ifdef CELL
-#include <libspe2.h>
-#endif
 
 /* Include conditional headers. */
 #include "config.h"
@@ -53,8 +50,8 @@
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
-#include "cell.h"
+#include <particle.h>
+#include <space_cell.h>
 #include "task.h"
 #include "queue.h"
 #include "space.h"
@@ -121,13 +118,13 @@ char *engine_err_msg[29] = {
 int engine_shuffle ( struct engine *e ) {
 
 	int cid, k;
-	struct cell *c;
+	struct space_cell *c;
 	struct space *s = &e->s;
 
 	/* Flush the ghost cells (to avoid overlapping particles) */
 #pragma omp parallel for schedule(static), private(cid)
 	for ( cid = 0 ; cid < s->nr_ghost ; cid++ )
-		cell_flush( &(s->cells[s->cid_ghost[cid]]) , s->partlist , s->celllist );
+		space_cell_flush( &(s->cells[s->cid_ghost[cid]]) , s->partlist , s->celllist );
 
 	/* Shuffle the domain. */
 	if ( space_shuffle_local( s ) < 0 )
@@ -146,7 +143,7 @@ int engine_shuffle ( struct engine *e ) {
 	for ( cid = 0 ; cid < s->nr_marked ; cid++ ) {
 		c = &(s->cells[s->cid_marked[cid]]);
 		if ( !(c->flags & cell_flag_ghost) )
-			cell_welcome( c , s->partlist );
+			space_cell_welcome( c , s->partlist );
 		else {
 			for ( k = 0 ; k < c->incomming_count ; k++ )
 				e->s.partlist[ c->incomming[k].id ] = NULL;
@@ -198,8 +195,8 @@ int engine_verlet_update ( struct engine *e ) {
 
 	int cid, pid, k;
 	double dx, w, maxdx = 0.0, skin;
-	struct cell *c;
-	struct part *p;
+	struct space_cell *c;
+	struct particle *p;
 	struct space *s = &e->s;
 	ticks tic;
 #ifdef HAVE_OPENMP
@@ -330,7 +327,7 @@ s->maxdx = 0;
 int engine_split ( struct engine *e ) {
 
 	int i, k, cid, cjd;
-	struct cell *ci, *cj, *ct;
+	struct space_cell *ci, *cj, *ct;
 	struct space *s = &(e->s);
 
 	/* Check for nonsense inputs. */
@@ -482,13 +479,13 @@ int engine_split ( struct engine *e ) {
 	/* Empty unmarked cells. */
 	for ( k = 0 ; k < s->nr_cells ; k++ )
 		if ( !( s->cells[k].flags & cell_flag_marked ) )
-			cell_flush( &s->cells[k] , s->partlist , s->celllist );
+			space_cell_flush( &s->cells[k] , s->partlist , s->celllist );
 
 	/* Set ghost markings on particles. */
 	for ( cid = 0 ; cid < s->nr_cells ; cid++ )
 		if ( s->cells[cid].flags & cell_flag_ghost )
 			for ( k = 0 ; k < s->cells[cid].count ; k++ )
-				s->cells[cid].parts[k].flags |= part_flag_ghost;
+				s->cells[cid].parts[k].flags |= PARTICLE_FLAG_GHOST;
 
 	/* Fill the cid lists with marked, local and ghost cells. */
 	s->nr_real = 0; s->nr_ghost = 0; s->nr_marked = 0;
@@ -599,8 +596,8 @@ int engine_split_METIS ( struct engine *e, int N, int flags){
 	/*results*/
 	idx_t *objval = (idx_t*) malloc(sizeof(idx_t));
 	if(objval==NULL)return 1;
-	idx_t *part = (idx_t*) malloc(e->s.nr_cells * (sizeof(idx_t)));
-	if(part==NULL)return 1;
+	idx_t *particle = (idx_t*) malloc(e->s.nr_cells * (sizeof(idx_t)));
+	if(particle==NULL)return 1;
 
 	//Loop over cell pairs and add to array if valid. Needs to be double loop.
 	currentIndex=0;
@@ -708,14 +705,14 @@ int engine_split_METIS ( struct engine *e, int N, int flags){
 	//	options[METIS_OPTION_DBGLVL] = METIS_DBG_INFO;
 
 	//Run METIS to partition the graph
-	METIS_PartGraphKway( nvtxs , ncon , xadj , adjncy , vwgt , NULL , adjwgt , nparts , NULL , NULL , options , objval , part );
+	METIS_PartGraphKway( nvtxs , ncon , xadj , adjncy , vwgt , NULL , adjwgt , nparts , NULL , NULL , options , objval , particle );
 	if( flags == engine_split_MPI )
 	{
 		for(i = 0; i < e->s.nr_cells; i++ )
 		{
-			e->s.cells[i].nodeID = part[i];
+			e->s.cells[i].nodeID = particle[i];
 			//Not my cell? Mark as ghost.
-			if(part[i] != e->nodeID)
+			if(particle[i] != e->nodeID)
 				e->s.cells[i].flags |= cell_flag_ghost;
 			e->nr_nodes = N;
 
@@ -726,7 +723,7 @@ int engine_split_METIS ( struct engine *e, int N, int flags){
 		int part2 = 0;
 		for( i = 0 ; i < e->s.nr_cells ; i++ )
 		{
-			e->s.cells[i].GPUID = part[i];
+			e->s.cells[i].GPUID = particle[i];
 			if(e->s.cells[i].GPUID == 0)
 				part1++;
 			else
@@ -748,7 +745,7 @@ int engine_split_METIS ( struct engine *e, int N, int flags){
 	free(ncon);
 	free(nparts);
 	free(objval);
-	free(part);
+	free(particle);
 	free(options);
 	printf("Successfully split the space\n");
 
@@ -762,7 +759,7 @@ int engine_split_METIS ( struct engine *e, int N, int flags){
 		int i, j, k, m, Nm;
 		int hx, hy, hz;
 		unsigned int flag = 0;
-		struct cell *c;
+		struct space_cell *c;
 
 		/* Check inputs. */
 		if ( x_max < x_min || y_max < y_min || z_max < z_min )
@@ -863,7 +860,7 @@ static int engine_split_bisect_rec(struct engine *e, int N_min , int N_max ,
 	int i, j, k, m, Nm;
 	int hx, hy, hz;
 	unsigned int flag = 0;
-	struct cell *c;
+	struct space_cell *c;
 
 	/* Check inputs. */
 	if ( x_max < x_min || y_max < y_min || z_max < z_min )
@@ -1069,8 +1066,8 @@ int engine_setexplepot ( struct engine *e , struct potential *ep ) {
 
 int engine_unload ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid , double *q , unsigned int *flags , double *epot , int N ) {
 
-	struct part *p;
-	struct cell *c;
+	struct particle *p;
+	struct space_cell *c;
 	int j, k, cid, count = 0, *ind;
 	double epot_acc = 0.0;
 
@@ -1161,8 +1158,8 @@ int engine_unload ( struct engine *e , double *x , double *v , int *type , int *
 
 int engine_unload_marked ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid , double *q , unsigned int *flags , double *epot , int N ) {
 
-	struct part *p;
-	struct cell *c;
+	struct particle *p;
+	struct space_cell *c;
 	int j, k, cid, count = 0, *ind;
 	double epot_acc = 0.0;
 
@@ -1256,8 +1253,8 @@ int engine_unload_marked ( struct engine *e , double *x , double *v , int *type 
 
 int engine_unload_strays ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid , double *q , unsigned int *flags , double *epot , int N ) {
 
-	struct part *p;
-	struct cell *c;
+	struct particle *p;
+	struct space_cell *c;
 	int j, k, cid, count = 0;
 	double epot_acc = 0.0;
 
@@ -1275,11 +1272,11 @@ int engine_unload_strays ( struct engine *e , double *x , double *v , int *type 
 		epot_acc += c->epot;
 
 		/* Loop over the parts in this cell. */
-		for ( k = c->count-1 ; k >= 0 && !(c->parts[k].flags & part_flag_ghost) ; k-- ) {
+		for ( k = c->count-1 ; k >= 0 && !(c->parts[k].flags & PARTICLE_FLAG_GHOST) ; k-- ) {
 
 			/* Get a hold of the particle. */
 			p = &( c->parts[k] );
-			if ( p->flags & part_flag_ghost )
+			if ( p->flags & PARTICLE_FLAG_GHOST )
 				continue;
 
 			/* get this particle's data, where requested. */
@@ -1338,7 +1335,7 @@ int engine_unload_strays ( struct engine *e , double *x , double *v , int *type 
 
 int engine_load ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid , double *q , unsigned int *flags , int N ) {
 
-	struct part p;
+	struct particle p;
 	struct space *s;
 	int j, k;
 
@@ -1353,7 +1350,7 @@ int engine_load ( struct engine *e , double *x , double *v , int *type , int *pi
 	p.v[0] = 0.0; p.v[1] = 0.0; p.v[2] = 0.0;
 	p.f[0] = 0.0; p.f[1] = 0.0; p.f[2] = 0.0;
 	p.q = 0.0;
-	p.flags = part_flag_none;
+	p.flags = PARTICLE_FLAG_NONE;
 
 	/* loop over the entries. */
 	for ( j = 0 ; j < N ; j++ ) {
@@ -1407,7 +1404,7 @@ int engine_load ( struct engine *e , double *x , double *v , int *type , int *pi
 
 int engine_load_ghosts ( struct engine *e , double *x , double *v , int *type , int *pid , int *vid , double *q , unsigned int *flags , int N ) {
 
-	struct part p;
+	struct particle p;
 	struct space *s;
 	int j, k;
 
@@ -1422,7 +1419,7 @@ int engine_load_ghosts ( struct engine *e , double *x , double *v , int *type , 
 	p.v[0] = 0.0; p.v[1] = 0.0; p.v[2] = 0.0;
 	p.f[0] = 0.0; p.f[1] = 0.0; p.f[2] = 0.0;
 	p.q = 0.0;
-	p.flags = part_flag_ghost;
+	p.flags = PARTICLE_FLAG_GHOST;
 
 	/* loop over the entries. */
 	for ( j = 0 ; j < N ; j++ ) {
@@ -1436,7 +1433,7 @@ int engine_load_ghosts ( struct engine *e , double *x , double *v , int *type , 
 		if ( vid != NULL )
 			p.vid = vid[j];
 		if ( flags != NULL )
-			p.flags = flags[j] | part_flag_ghost;
+			p.flags = flags[j] | PARTICLE_FLAG_GHOST;
 		if ( v != NULL )
 			for ( k = 0 ; k < 3 ; k++ )
 				p.v[k] = v[j*3+k];
@@ -1609,8 +1606,8 @@ int engine_addpot ( struct engine *e , struct potential *p , int i , int j ) {
 int engine_start ( struct engine *e , int nr_runners , int nr_queues ) {
 
 	int cid, pid, k, i;
-	struct cell *c;
-	struct part *p;
+	struct space_cell *c;
+	struct particle *p;
 	struct space *s = &e->s;
 
 	/* Is MPI really needed? */
@@ -1733,72 +1730,6 @@ int engine_start ( struct engine *e , int nr_runners , int nr_queues ) {
 
 
 /**
- * @brief Start the SPU-associated runners in the given #engine.
- *
- * @param e The #engine to start.
- * @param nr_runners The number of runners start.
- *
- * @return #engine_err_ok or < 0 on error (see #engine_err).
- *
- * Allocates and starts the specified number of #runner.
- */
-
-int engine_start_SPU ( struct engine *e , int nr_runners ) {
-
-	int i;
-	struct runner *temp;
-
-#ifdef WITH_MPI
-	/* Set up async communication? */
-	if ( e->flags & engine_flag_async ) {
-
-		/* Init the mutex and condition variable for the asynchronous communication. */
-		if ( pthread_mutex_init( &e->xchg_mutex , NULL ) != 0 ||
-				pthread_cond_init( &e->xchg_cond , NULL ) != 0 )
-			return error(engine_err_pthread);
-
-		/* Set the exchange flags. */
-		e->xchg_started = 0;
-		e->xchg_running = 0;
-
-		/* Start a thread with the async exchange. */
-		if ( pthread_create( &e->thread_exchg , NULL , (void *(*)(void *))engine_exchange_async_run , e ) != 0 )
-			return error(engine_err_pthread);
-
-	}
-#endif
-
-	/* (re)allocate the runners */
-	if ( e->nr_runners == 0 ) {
-		if ( ( e->runners = (struct runner *)malloc( sizeof(struct runner) * nr_runners )) == NULL )
-			return error(engine_err_malloc);
-	}
-	else {
-		if ( ( temp = (struct runner *)malloc( sizeof(struct runner) * (e->nr_runners + nr_runners) )) == NULL )
-			return error(engine_err_malloc);
-		memcpy( temp , e->runners , sizeof(struct runner) * e->nr_runners );
-		free( e->runners );
-		e->runners = temp;
-	}
-
-	/* initialize the runners. */
-	for ( i = 0 ; i < nr_runners ; i++ )
-		if ( runner_init_SPU(&e->runners[e->nr_runners + i],e,e->nr_runners + i) < 0 )
-			return error(engine_err_runner);
-	e->nr_runners += nr_runners;
-
-	/* wait for the runners to be in place */
-	while (e->barrier_count != e->nr_runners)
-		if (pthread_cond_wait(&e->done_cond,&e->barrier_mutex) != 0)
-			return error(engine_err_pthread);
-
-	/* all is well... */
-	return engine_err_ok;
-
-}
-
-
-/**
  * @brief Compute the nonbonded interactions in the current step.
  * 
  * @param e The #engine on which to run.
@@ -1851,8 +1782,8 @@ int engine_nonbond_eval ( struct engine *e ) {
 int engine_advance ( struct engine *e ) {
 
 	int cid, pid, k, delta[3], step;
-	struct cell *c, *c_dest;
-	struct part *p;
+	struct space_cell *c, *c_dest;
+	struct particle *p;
 	struct space *s;
 	FPTYPE dt, w, h[3];
 	double epot = 0.0, epot_local;
@@ -1924,7 +1855,7 @@ epot += epot_local;
 										(c->loc[2] + delta[2] + s->cdim[2]) % s->cdim[2] ) ] );
 
 								pthread_mutex_lock(&c_dest->cell_mutex);
-								cell_add_incomming( c_dest , p );
+								space_cell_add_incomming( c_dest , p );
 								pthread_mutex_unlock(&c_dest->cell_mutex);
 
 								s->celllist[ p->id ] = c_dest;
@@ -1945,7 +1876,7 @@ epot += epot_local;
 		/* Welcome the new particles in each cell. */
 #pragma omp parallel for schedule(static)
 		for ( cid = 0 ; cid < s->nr_marked ; cid++ )
-			cell_welcome( &(s->cells[ s->cid_marked[cid] ]) , s->partlist );
+			space_cell_welcome( &(s->cells[ s->cid_marked[cid] ]) , s->partlist );
 
 	}
 
@@ -2394,7 +2325,7 @@ int engine_init ( struct engine *e , const double *origin , const double *dim , 
 		max_type += 1;
 	e->max_type = max_type;
 	e->nr_types = 0;
-	if ( ( e->types = (struct part_type *)malloc( sizeof(struct part_type) * max_type ) ) == NULL )
+	if ( ( e->types = (struct particle_type *)malloc( sizeof(struct particle_type) * max_type ) ) == NULL )
 		return error(engine_err_malloc);
 	if ( flags & engine_flag_nullpart ) {
 		e->types[0].id = 0;

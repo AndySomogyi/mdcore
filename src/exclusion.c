@@ -43,10 +43,10 @@
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
+#include <particle.h>
 #include "potential.h"
 #include "potential_eval.h"
-#include "cell.h"
+#include <space_cell.h>
 #include "space.h"
 #include "engine.h"
 #include "exclusion.h"
@@ -83,8 +83,8 @@ int exclusion_eval ( struct exclusion *b , int N , struct engine *e , double *ep
     int bid, pid, pjd, k, *loci, *locj, shift[3], ld_pots;
     double h[3], epot = 0.0;
     struct space *s;
-    struct part *pi, *pj, **partlist;
-    struct cell **celllist;
+    struct particle *pi, *pj, **partlist;
+    struct space_cell **celllist;
     struct potential *pot, **pots;
     FPTYPE r2, w, cutoff2;
 #if defined(VECTORIZE)
@@ -126,8 +126,8 @@ int exclusion_eval ( struct exclusion *b , int N , struct engine *e , double *ep
             continue;
         
         /* Skip if both ghosts. */
-        if ( ( pi->flags & part_flag_ghost ) && 
-             ( pj->flags & part_flag_ghost ) )
+        if ( ( pi->flags & PARTICLE_FLAG_GHOST ) && 
+             ( pj->flags & PARTICLE_FLAG_GHOST ) )
             continue;
             
         /* Get the potential. */
@@ -287,8 +287,8 @@ int exclusion_evalf ( struct exclusion *b , int N , struct engine *e , FPTYPE *f
     int bid, pid, pjd, k, *loci, *locj, shift[3], ld_pots;
     double h[3], epot = 0.0;
     struct space *s;
-    struct part *pi, *pj, **partlist;
-    struct cell **celllist;
+    struct particle *pi, *pj, **partlist;
+    struct space_cell **celllist;
     struct potential *pot, **pots;
     FPTYPE dx[3], r2, w, cutoff2;
 #if defined(VECTORIZE)
@@ -329,8 +329,8 @@ int exclusion_evalf ( struct exclusion *b , int N , struct engine *e , FPTYPE *f
             continue;
         
         /* Skip if both ghosts. */
-        if ( ( pi->flags & part_flag_ghost ) && 
-             ( pj->flags & part_flag_ghost ) )
+        if ( ( pi->flags & PARTICLE_FLAG_GHOST ) && 
+             ( pj->flags & PARTICLE_FLAG_GHOST ) )
             continue;
             
         /* Get the potential. */

@@ -31,11 +31,6 @@
 
 /* Include some conditional headers. */
 #include "config.h"
-#ifdef CELL
-    #include <libspe2.h>
-    #include <libmisc.h>
-    #define ceil128(v) (((v) + 127) & ~127)
-#endif
 #ifdef __SSE__
     #include <xmmintrin.h>
 #endif
@@ -51,21 +46,13 @@
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
-#include "cell.h"
+#include <particle.h>
+#include <space_cell.h>
 #include "space.h"
 #include "potential.h"
 #include "potential_eval.h"
 #include "engine.h"
 #include "runner.h"
-
-
-
-#ifdef CELL
-    /* the SPU executeable */
-    extern spe_program_handle_t runner_spu;
-#endif
-
 
 /* the error macro. */
 #define error(id)				( runner_err = errs_register( id , runner_err_msg[-(id)] , __LINE__ , __FUNCTION__ , __FILE__ ) )
@@ -94,12 +81,12 @@ extern unsigned int runner_rcount;
  *
  */
  
-__attribute__ ((flatten)) int runner_dosort ( struct runner *r , struct cell *c , int flags ) {
+__attribute__ ((flatten)) int runner_dosort ( struct runner *r , struct space_cell *c , int flags ) {
 
-    struct part *p;
+    struct particle *p;
     struct space *s;
     int i, k, sid;
-    struct part *parts;
+    struct particle *parts;
     struct engine *eng;
     unsigned int *iparts;
     FPTYPE dscale;
@@ -121,8 +108,8 @@ __attribute__ ((flatten)) int runner_dosort ( struct runner *r , struct cell *c 
     
     /* Make local copies of the parts if requested. */
     if ( r->e->flags & engine_flag_localparts ) {
-        parts = (struct part *)alloca( sizeof(struct part) * count );
-        memcpy( parts , c->parts , sizeof(struct part) * count );
+        parts = (struct particle *)alloca( sizeof(struct particle) * count );
+        memcpy( parts , c->parts , sizeof(struct particle) * count );
         }
     else
         parts = c->parts;

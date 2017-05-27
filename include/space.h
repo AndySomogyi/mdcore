@@ -67,7 +67,9 @@ MDCORE_BEGIN_DECLS
 extern int space_err;
 
 
-/** The space structure */
+/**
+ * The space structure
+ */
 typedef struct space {
 
 	/** Real dimensions. */
@@ -99,7 +101,7 @@ typedef struct space {
 	int nr_real, nr_ghost, nr_marked;
 
 	/** Array of cells spanning the space. */
-	struct cell *cells;
+	struct space_cell *cells;
 
 	/** The total number of tasks. */
 	int nr_tasks, tasks_size;
@@ -121,10 +123,10 @@ typedef struct space {
 	int nr_swaps, nr_stalls;
 
 	/** Array of pointers to the individual parts, sorted by their ID. */
-	struct part **partlist;
+	struct particle **partlist;
 
 	/** Array of pointers to the #cell of individual parts, sorted by their ID. */
-	struct cell **celllist;
+	struct space_cell **celllist;
 
 	/** Number of parts in this space and size of the buffers partlist and celllist. */
 	int nr_parts, size_parts;
@@ -143,10 +145,10 @@ typedef struct space {
 
 /* associated functions */
 int space_init ( struct space *s , const double *origin , const double *dim , double *L , double cutoff , unsigned int period );
-int space_getsid ( struct space *s , struct cell **ci , struct cell **cj , FPTYPE *shift );
+int space_getsid ( struct space *s , struct space_cell **ci , struct space_cell **cj , FPTYPE *shift );
 int space_shuffle ( struct space *s );
 int space_shuffle_local ( struct space *s );
-int space_addpart ( struct space *s , struct part *p , double *x );
+int space_addpart ( struct space *s , struct particle *p , double *x );
 int space_prepare ( struct space *s );
 int space_getpos ( struct space *s , int id , double *x );
 int space_setpos ( struct space *s , int id , double *x );

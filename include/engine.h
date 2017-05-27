@@ -147,7 +147,7 @@ typedef struct engine {
 	int nr_types;
 
 	/** The particle types. */
-	struct part_type *types;
+	struct particle_type *types;
 
 	/** The interaction matrix */
 	struct potential **p, **p_bond, **p_angle, **p_dihedral;
@@ -334,7 +334,7 @@ int engine_setexplepot ( struct engine *e , struct potential *ep );
 int engine_shuffle ( struct engine *e );
 int engine_split_bisect ( struct engine *e , int N );
 int engine_split ( struct engine *e );
-int engine_start_SPU ( struct engine *e , int nr_runners );
+
 int engine_start ( struct engine *e , int nr_runners , int nr_queues );
 int engine_step ( struct engine *e );
 int engine_timers_reset ( struct engine *e );

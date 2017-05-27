@@ -17,20 +17,21 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  * 
  ******************************************************************************/
-#ifndef INCLUDE_PART_H_
-#define INCLUDE_PART_H_
+#ifndef INCLUDE_PARTICLE_H_
+#define INCLUDE_PARTICLE_H_
 #include "platform.h"
+#include "fptype.h"
 
 /* error codes */
-#define part_err_ok                     0
-#define part_err_null                   -1
-#define part_err_malloc                 -2
+#define PARTICLE_ERR_OK                 0
+#define PARTICLE_ERR_NULL              -1
+#define PARTICLE_ERR_MALLOC            -2
 
 
 /* particle flags */
-#define part_flag_none                  0
-#define part_flag_frozen                1
-#define part_flag_ghost                 2
+#define PARTICLE_FLAG_NONE              0
+#define PARTICLE_FLAG_FROZEN            1
+#define PARTICLE_FLAG_GHOST             2
 
 
 /* default values */
@@ -39,16 +40,16 @@ MDCORE_BEGIN_DECLS
 
 
 /** ID of the last error. */
-extern int part_err;
+extern int particle_err;
 
 
 /**
- * The #part data structure.
+ * The #particle data structure.
  *
  * Note that the arrays for @c x, @c v and @c f are 4 entries long for
  * propper alignment.
  */
-typedef struct part {
+typedef struct particle {
 
 	/** Particle position */
 	FPTYPE x[4] __attribute__ ((aligned (16)));
@@ -71,12 +72,12 @@ typedef struct part {
 	/** Particle flags */
 	unsigned short int flags;
 
-} part;
+} particle;
 
 
 
 /** Structure containing information on each particle species. */
-typedef struct part_type {
+typedef struct particle_type {
 
 	/** ID of this type */
 	int id;
@@ -90,11 +91,11 @@ typedef struct part_type {
 	/** Name of this paritcle type. */
 	char name[64], name2[64];
 
-} part_type;
+} particle_type;
 
 
 /* associated functions */
-int part_init ( struct part *p , int vid , int type , unsigned int flags );
+int particle_init ( struct particle *p , int vid , int type , unsigned int flags );
 
 MDCORE_END_DECLS
-#endif // INCLUDE_PART_H_
+#endif // INCLUDE_PARTICLE_H_

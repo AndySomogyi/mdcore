@@ -77,7 +77,7 @@ int main ( int argc , char *argv[] ) {
     double epot, ekin, temp, cutoff = 1.0, cellwidth;
     FPTYPE ee, eff;
     struct engine e;
-    struct part *p, pO, pH;
+    struct particle *p, pO, pH;
     struct potential *pot_OO, *pot_OH, *pot_HH, *pot_OHb, *pot_HOH;
     // struct potential *pot_ee;
     int i, j, k, cid, pid, nr_runners = 1, nr_steps = 1000;
@@ -223,8 +223,8 @@ int main ( int argc , char *argv[] ) {
     srand(6178);
     pO.type = 0;
     pH.type = 1;
-    pO.flags = part_flag_none;
-    pH.flags = part_flag_none;
+    pO.flags = PARTICLE_FLAG_NONE;
+    pH.flags = PARTICLE_FLAG_NONE;
     for ( k = 0 ; k < 3 ; k++ ) {
         pO.v[k] = 0.0; pH.v[k] = 0.0;
         pO.f[k] = 0.0; pH.f[k] = 0.0;

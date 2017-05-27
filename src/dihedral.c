@@ -43,10 +43,10 @@
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
+#include <particle.h>
 #include "potential.h"
 #include "potential_eval.h"
-#include "cell.h"
+#include <space_cell.h>
 #include "space.h"
 #include "engine.h"
 #include "dihedral.h"
@@ -84,8 +84,8 @@ int dihedral_eval ( struct dihedral *d , int N , struct engine *e , double *epot
     int *loci, *locj, *lock, *locl, shift[3];
     double h[3], epot = 0.0;
     struct space *s;
-    struct part *pi, *pj, *pk, *pl, **partlist;
-    struct cell **celllist;
+    struct particle *pi, *pj, *pk, *pl, **partlist;
+    struct space_cell **celllist;
     struct potential *pot;
     FPTYPE xi[3], xj[3], xk[3], xl[3], dxi[3], dxj[3], dxl[3], cphi;
     FPTYPE wi, wj, wl;
@@ -133,10 +133,10 @@ int dihedral_eval ( struct dihedral *d , int N , struct engine *e , double *epot
             continue;
             
         /* Skip if all three are ghosts. */
-        if ( ( pi->flags & part_flag_ghost ) &&
-             ( pj->flags & part_flag_ghost ) &&
-             ( pk->flags & part_flag_ghost ) &&
-             ( pl->flags & part_flag_ghost ) )
+        if ( ( pi->flags & PARTICLE_FLAG_GHOST ) &&
+             ( pj->flags & PARTICLE_FLAG_GHOST ) &&
+             ( pk->flags & PARTICLE_FLAG_GHOST ) &&
+             ( pl->flags & PARTICLE_FLAG_GHOST ) )
             continue;
             
         /* Get the potential. */
@@ -398,8 +398,8 @@ int dihedral_evalf ( struct dihedral *d , int N , struct engine *e , FPTYPE *f ,
     int *loci, *locj, *lock, *locl, shift[3];
     double h[3], epot = 0.0;
     struct space *s;
-    struct part *pi, *pj, *pk, *pl, **partlist;
-    struct cell **celllist;
+    struct particle *pi, *pj, *pk, *pl, **partlist;
+    struct space_cell **celllist;
     struct potential *pot;
     FPTYPE xi[3], xj[3], xk[3], xl[3], dxi[3], dxj[3], dxl[3], cphi;
     FPTYPE wi, wj, wl;
@@ -447,10 +447,10 @@ int dihedral_evalf ( struct dihedral *d , int N , struct engine *e , FPTYPE *f ,
             continue;
         
         /* Skip if all three are ghosts. */
-        if ( ( pi->flags & part_flag_ghost ) &&
-             ( pj->flags & part_flag_ghost ) &&
-             ( pk->flags & part_flag_ghost ) &&
-             ( pl->flags & part_flag_ghost ) )
+        if ( ( pi->flags & PARTICLE_FLAG_GHOST ) &&
+             ( pj->flags & PARTICLE_FLAG_GHOST ) &&
+             ( pk->flags & PARTICLE_FLAG_GHOST ) &&
+             ( pl->flags & PARTICLE_FLAG_GHOST ) )
             continue;
             
         /* Get the potential. */

@@ -49,10 +49,6 @@
 /** Number of particles to request per call to space_getverlet. */
 #define runner_verlet_bitesize           200
 
-/** Length of the cell pair queue between the PPU and the SPU
-    and of the fifo-queue in dispatch mode. */
-#define runner_qlen                      8
-
 /** Magic word to make the dispatcher stop. */
 #define runner_dispatch_stop             0xffffffff
 #define runner_dispatch_lookahead        20
@@ -130,23 +126,6 @@ typedef struct runner {
 	/* my thread */
 	pthread_t thread;
 
-#ifdef CELL
-
-	/* the SPE context */
-	spe_context_ptr_t spe;
-	pthread_t spe_thread;
-
-	/* the (re-)entry point */
-	unsigned int entry;
-
-	/* the initialization data */
-	void *data;
-
-	/* the compacted cell list */
-	struct celldata *celldata;
-
-#endif
-
 	/** ID of the last error on this runner. */
 	int err;
 
@@ -155,27 +134,19 @@ typedef struct runner {
 
 } runner;
 
-#ifdef CELL
-struct celldata {
-	int ni;
-	unsigned long long ai;
-};
-#endif
-
-
 
 /* associated functions */
-int runner_dopair_unsorted ( struct runner *r , struct cell *cell_i , struct cell *cell_j );
-int runner_init_SPU ( struct runner *r , struct engine *e , int id );
+int runner_dopair_unsorted ( struct runner *r , struct space_cell *cell_i , struct space_cell *cell_j );
+
 int runner_init ( struct runner *r , struct engine *e , int id );
 int runner_run ( struct runner *r );
 void runner_sort_ascending ( unsigned int *parts , int N );
 void runner_sort_descending ( unsigned int *parts , int N );
-int runner_verlet_eval ( struct runner *r , struct cell *c , FPTYPE *f_out );
-int runner_verlet_fill ( struct runner *r , struct cell *cell_i , struct cell *cell_j , FPTYPE *pshift );
-int runner_dosort ( struct runner *r , struct cell *c , int flags );
-int runner_dopair ( struct runner *r , struct cell *cell_i , struct cell *cell_j , int sid );
-int runner_doself ( struct runner *r , struct cell *cell_i );
+int runner_verlet_eval ( struct runner *r , struct space_cell *c , FPTYPE *f_out );
+int runner_verlet_fill ( struct runner *r , struct space_cell *cell_i , struct space_cell *cell_j , FPTYPE *pshift );
+int runner_dosort ( struct runner *r , struct space_cell *c , int flags );
+int runner_dopair ( struct runner *r , struct space_cell *cell_i , struct space_cell *cell_j , int sid );
+int runner_doself ( struct runner *r , struct space_cell *cell_i );
 
 MDCORE_END_DECLS
 

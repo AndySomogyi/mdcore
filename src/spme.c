@@ -38,14 +38,16 @@
 
 /* I will need fftw for this. */
 #include <complex.h>
+#ifdef HAVE_FFTW3
 #include <fftw3.h>
+#endif
 
 /* include local headers */
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
-#include "cell.h"
+#include <particle.h>
+#include <space_cell.h>
 #include "spme.h"
 
 
@@ -120,7 +122,7 @@ int spme_doconv ( struct spme *s ) {
  *
  */
  
-void spme_iact ( struct spme *restrict s , struct cell *restrict cp , struct cell *restrict cg ) {
+void spme_iact ( struct spme *restrict s , struct space_cell *restrict cp , struct space_cell *restrict cg ) {
 
 #ifdef HAVE_FFTW3
     int j, k, pid, ind[3], dim[3];

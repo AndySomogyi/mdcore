@@ -43,10 +43,10 @@
 #include "errs.h"
 #include "fptype.h"
 #include "lock.h"
-#include "part.h"
+#include <particle.h>
 #include "potential.h"
 #include "potential_eval.h"
-#include "cell.h"
+#include <space_cell.h>
 #include "space.h"
 #include "engine.h"
 #include "bond.h"
@@ -83,8 +83,8 @@ int bond_eval ( struct bond *b , int N , struct engine *e , double *epot_out ) {
     int bid, pid, pjd, k, *loci, *locj, shift[3], ld_pots;
     double h[3], epot = 0.0;
     struct space *s;
-    struct part *pi, *pj, **partlist;
-    struct cell **celllist;
+    struct particle *pi, *pj, **partlist;
+    struct space_cell **celllist;
     struct potential *pot, **pots;
     FPTYPE r2, w;
 #if defined(VECTORIZE)
@@ -126,8 +126,8 @@ int bond_eval ( struct bond *b , int N , struct engine *e , double *epot_out ) {
             continue;
         
         /* Skip if both ghosts. */
-        if ( ( pi->flags & part_flag_ghost ) && 
-             ( pj->flags & part_flag_ghost ) )
+        if ( ( pi->flags & PARTICLE_FLAG_GHOST ) && 
+             ( pj->flags & PARTICLE_FLAG_GHOST ) )
             continue;
             
         /* Get the potential. */
@@ -284,8 +284,8 @@ int bond_evalf ( struct bond *b , int N , struct engine *e , FPTYPE *f , double 
     int bid, pid, pjd, k, *loci, *locj, shift[3], ld_pots;
     double h[3], epot = 0.0;
     struct space *s;
-    struct part *pi, *pj, **partlist;
-    struct cell **celllist;
+    struct particle *pi, *pj, **partlist;
+    struct space_cell **celllist;
     struct potential *pot, **pots;
     FPTYPE r2, w;
 #if defined(VECTORIZE)
@@ -327,7 +327,7 @@ int bond_evalf ( struct bond *b , int N , struct engine *e , FPTYPE *f , double 
             continue;
         
         /* Skip if both ghosts. */
-        if ( pi->flags & part_flag_ghost && pj->flags & part_flag_ghost )
+        if ( pi->flags & PARTICLE_FLAG_GHOST && pj->flags & PARTICLE_FLAG_GHOST )
             continue;
             
         /* Get the potential. */

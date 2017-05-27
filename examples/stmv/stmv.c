@@ -108,7 +108,7 @@ int main ( int argc , char *argv[] ) {
     
     /* mdcore stuff. */
     struct engine e;
-    struct part *p;
+    struct particle *p;
     struct potential *pot;
     int typeOT, nr_runners = 1, nr_steps = 1000;
     char *excl[] = { "OT" , "HT" };

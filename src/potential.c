@@ -32,7 +32,7 @@
 #include "potential_eval.h"
 
 /** Macro to easily define vector types. */
-#define vector(elcount, type)  __attribute__((vector_size((elcount)*sizeof(type)))) type
+#define simd_vector(elcount, type)  __attribute__((vector_size((elcount)*sizeof(type)))) type
 
 /** The last error */
 int potential_err = potential_err_ok;
